@@ -1,5 +1,3 @@
-Berikut adalah langkah-langkah yang tertata lebih rapi dan menarik untuk digunakan dalam README di GitHub:
-
 ---
 
 # Integrasi Aplikasi Morning Report di RSUD dr R Koesma
