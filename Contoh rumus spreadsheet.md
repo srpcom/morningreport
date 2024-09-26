@@ -24,4 +24,4 @@ Rumus 6 Query
 ```
 =QUERY(Sheet1!B1:F; "SELECT * WHERE (" & IF(C1=""; "1=1"; "B = DATE '" & TEXT(C1; "yyyy-MM-dd") & "'") & ")"; 1)
 ```
-untuk penjelasan rumus pakai saja chat gpt
+untuk penjelasan rumus pakai saja chat gpt https://chatgpt.com/
