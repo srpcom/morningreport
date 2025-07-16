@@ -1,40 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aplikasi Morning Report</title>
+  
+  <!-- Impor Font dan CSS dari CDN -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Impor Pustaka Tanda Tangan -->
   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+  
   <style>
+    /* Gaya dasar untuk aplikasi */
     body { font-family: 'Inter', sans-serif; }
     .page { display: none; }
     .page.active { display: block; animation: fadeIn 0.3s; }
-    @keyframes fadeIn { from { opacity: 0; } to { { opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Gaya untuk loader/spinner */
     #loader {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.85);
       display: flex; align-items: center; justify-content: center;
       z-index: 9999; flex-direction: column;
+      backdrop-filter: blur(4px);
     }
     .spinner {
       border: 4px solid rgba(0, 0, 0, 0.1);
       width: 36px; height: 36px;
-      border-radius: 50%; border-left-color: #09f;
+      border-radius: 50%; border-left-color: #3b82f6; /* Warna biru */
       animation: spin 1s ease infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* Gaya untuk area tanda tangan */
     #signature-pad { cursor: crosshair; }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
 
+  <!-- Elemen Loader -->
   <div id="loader" style="display: none;">
     <div class="spinner"></div>
-    <p class="mt-2 text-gray-600">Memproses...</p>
+    <p class="mt-3 text-gray-600">Memproses...</p>
   </div>
 
+  <!-- Kontainer Utama Aplikasi -->
   <div id="app" class="max-w-4xl mx-auto p-4 md:p-6">
     <header class="text-center mb-6">
       <img src="https://jeparahariini.com/wp-content/uploads/2020/03/logo-pemkab-tuban.png" alt="Logo RSUD" class="h-20 mx-auto mb-4" onerror="this.style.display='none'">
@@ -43,21 +56,20 @@
     </header>
 
     <main id="main-content">
+      <!-- Halaman Utama (Menu) -->
       <div id="page-utama" class="page">
         <div class="bg-white p-4 rounded-lg shadow-md mb-6">
           <h2 class="text-xl font-semibold mb-3 text-center">Jadwal & Informasi</h2>
-          <img id="gambar-jadwal" src="https://placehold.co/800x400/cccccc/ffffff?text=Memuat+Jadwal..." alt="Jadwal Kegiatan" class="w-full rounded-md object-cover">
+          <img id="gambar-jadwal" src="https://placehold.co/800x400/e2e8f0/475569?text=Memuat+Jadwal..." alt="Jadwal Kegiatan" class="w-full rounded-md object-cover">
         </div>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
           <button onclick="tampilkanHalaman('page-input-hadir')" class="bg-blue-600 text-white p-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors">Input Daftar Hadir</button>
           <button onclick="bukaHalamanViewHadir()" class="bg-green-600 text-white p-4 rounded-lg shadow-md hover:bg-green-700 transition-colors">View Kehadiran</button>
-          <button disabled class="bg-yellow-300 text-white p-4 rounded-lg shadow-md cursor-not-allowed">Upload Bahan</button>
-          <button disabled class="bg-gray-400 text-white p-4 rounded-lg shadow-md cursor-not-allowed">Arsip Laporan</button>
-          <a id="link-notulen" href="#" target="_blank" class="bg-purple-600 text-white p-4 rounded-lg shadow-md hover:bg-purple-700 transition-colors text-center flex items-center justify-center">Buka Notulen</a>
-          <button disabled class="bg-red-400 text-white p-4 rounded-lg shadow-md cursor-not-allowed">Login Admin</button>
+          <a id="link-notulen" href="#" target="_blank" class="bg-purple-600 text-white p-4 rounded-lg shadow-md hover:bg-purple-700 transition-colors text-center flex items-center justify-center col-span-2 md:col-span-1">Buka Notulen</a>
         </div>
       </div>
 
+      <!-- Halaman Input Daftar Hadir -->
       <div id="page-input-hadir" class="page">
         <div class="bg-white p-6 rounded-lg shadow-md">
           <h2 class="text-xl font-semibold mb-4">Formulir Kehadiran</h2>
@@ -91,6 +103,7 @@
         </div>
       </div>
 
+      <!-- Halaman View Kehadiran -->
       <div id="page-view-hadir" class="page">
         <div class="bg-white p-6 rounded-lg shadow-md">
           <div class="flex justify-between items-center mb-4">
@@ -101,66 +114,60 @@
         </div>
       </div>
     </main>
+    
     <footer class="text-center mt-8 text-sm text-gray-500">
       <p>&copy; 2024 - Tim IT RSUD dr. R. Koesma Tuban</p>
     </footer>
   </div>
 
 <script>
-  // --- KONFIGURASI ---
+  // --- KONFIGURASI APLIKASI ---
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbya-XiYph0VQXjgNLfWXQ-qmkk7q4HcU7N6g0x-PCIvrMHhILl9p-_aNUWd-zOUdAWH/exec";
 
-  // --- STATE & SETUP ---
+  // --- VARIABEL GLOBAL ---
   let signaturePad;
   let canvas;
 
+  // --- FUNGSI UTAMA ---
+
+  // Inisialisasi semua event listener saat halaman selesai dimuat
   document.addEventListener('DOMContentLoaded', function() {
     canvas = document.getElementById('signature-pad');
     setupSignaturePad();
     loadInitialData();
+    
     document.getElementById('form-kehadiran').addEventListener('submit', handleFormKehadiranSubmit);
     document.getElementById('clear-signature').addEventListener('click', () => signaturePad.clear());
     window.addEventListener("resize", resizeCanvas);
   });
 
-  function resizeCanvas() {
-    if (!canvas) return;
-    const ratio =  Math.max(window.devicePixelRatio || 1, 1);
-    canvas.width = canvas.offsetWidth * ratio;
-    canvas.height = canvas.offsetHeight * ratio;
-    canvas.getContext("2d").scale(ratio, ratio);
-    if (signaturePad) signaturePad.clear(); 
-  }
-
-  function setupSignaturePad() {
-    signaturePad = new SignaturePad(canvas, { backgroundColor: 'rgb(255, 255, 255)' });
-  }
-
-  // --- API CALL HELPER ---
-  async function callAppsScript(functionName, data = {}) {
+  // Fungsi untuk memanggil API di Google Apps Script
+  async function callApi(functionName, data = {}) {
     showLoader();
     try {
       const res = await fetch(SCRIPT_URL, {
         method: 'POST',
+        redirect: 'follow', // Penting untuk menangani redirect dari Google
         body: JSON.stringify({ function: functionName, data: data }),
-        headers: { 'Content-Type': 'application/json' },
-        mode: 'no-cors' // Coba ganti ke 'no-cors' jika masih gagal
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Gunakan text/plain untuk menghindari preflight
       });
-
-      // Karena mode 'no-cors' membuat response tidak bisa dibaca,
-      // kita asumsikan sukses dan tidak menampilkan pesan dari server.
-      // Ini adalah kompromi untuk melewati CORS yang sangat ketat.
+      
+      const response = await res.json();
       hideLoader();
-      return { status: 'sukses_terkirim' };
 
+      if (response.status !== 'sukses') {
+        throw new Error(response.message || 'Terjadi kesalahan di server.');
+      }
+      return response;
     } catch (error) {
       hideLoader();
-      showAlert(`Terjadi kesalahan jaringan: ${error.message}`);
+      showAlert(`Terjadi kesalahan: ${error.message}`);
       throw error;
     }
   }
 
-  // --- UI & NAVIGATION ---
+  // --- MANAJEMEN TAMPILAN (UI) ---
+
   const loader = document.getElementById('loader');
   function tampilkanHalaman(idHalaman) {
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
@@ -177,26 +184,21 @@
   function hideLoader() { loader.style.display = 'none'; }
   function showAlert(message) { alert(message); }
 
-  // --- DATA HANDLING ---
+  // --- MANAJEMEN DATA ---
+
+  // Memuat data awal (gambar jadwal & link notulen)
   async function loadInitialData() {
     try {
-      // Untuk initial load, kita perlu response, jadi kita tidak bisa pakai 'no-cors'
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ function: 'getInitialConfig', data: {} }),
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const response = await res.json();
-      if (response.status !== 'sukses') throw new Error(response.message);
-
+      const response = await callApi('getInitialConfig');
       document.getElementById('gambar-jadwal').src = response.data.urlGambarJadwal;
       document.getElementById('link-notulen').href = response.data.urlNotulen;
       tampilkanHalaman('page-utama');
     } catch (error) {
-      showAlert('Gagal memuat data awal. Pastikan skrip Google sudah di-deploy ulang dengan benar. Error: ' + error.message);
+      // Error sudah ditangani di callApi
     }
   }
 
+  // Menangani pengiriman form kehadiran
   async function handleFormKehadiranSubmit(event) {
     event.preventDefault();
     if (signaturePad.isEmpty()) {
@@ -211,33 +213,31 @@
     };
     
     try {
-      await callAppsScript('simpanKehadiran', formData);
-      showAlert("Kehadiran Anda berhasil dikirim."); // Pesan generik
+      const response = await callApi('simpanKehadiran', formData);
+      showAlert(response.message);
       document.getElementById('form-kehadiran').reset();
       signaturePad.clear();
       kembaliKeUtama();
-    } catch (error) { /* error sudah ditangani */ }
+    } catch (error) {
+      // Error sudah ditangani di callApi
+    }
   }
 
+  // Membuka dan memuat data di halaman "View Kehadiran"
   async function bukaHalamanViewHadir() {
     tampilkanHalaman('page-view-hadir');
     const container = document.getElementById('container-daftar-hadir');
     container.innerHTML = '<p class="text-center text-gray-500">Memuat data kehadiran...</p>';
     
     try {
-       const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ function: 'getDaftarKehadiranHariIni', data: {} }),
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const response = await res.json();
-      if (response.status !== 'sukses') throw new Error(response.message);
+      const response = await callApi('getDaftarKehadiranHariIni');
       renderTabelKehadiran(response.data);
     } catch (error) {
-      container.innerHTML = `<p class="text-center text-red-500">Gagal memuat data: ${error.message}</p>`;
+      container.innerHTML = `<p class="text-center text-red-500">Gagal memuat data.</p>`;
     }
   }
 
+  // Menampilkan data kehadiran ke dalam tabel
   function renderTabelKehadiran(data) {
     const container = document.getElementById('container-daftar-hadir');
     if (!data || data.length === 0) {
@@ -251,6 +251,21 @@
     });
     tableHTML += '</tbody></table>';
     container.innerHTML = tableHTML;
+  }
+  
+  // --- FUNGSI UNTUK TANDA TANGAN ---
+  
+  function resizeCanvas() {
+    if (!canvas) return;
+    const ratio =  Math.max(window.devicePixelRatio || 1, 1);
+    canvas.width = canvas.offsetWidth * ratio;
+    canvas.height = canvas.offsetHeight * ratio;
+    canvas.getContext("2d").scale(ratio, ratio);
+    if (signaturePad) signaturePad.clear(); 
+  }
+
+  function setupSignaturePad() {
+    signaturePad = new SignaturePad(canvas, { backgroundColor: 'rgb(255, 255, 255)' });
   }
 </script>
 </body>
