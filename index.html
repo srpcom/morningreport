@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Morning Report - RSUD dr. R. Koesma</title>
-    <!-- [DIUBAH] Favicon ditambahkan -->
     <link rel="icon" type="image/jpeg" href="https://files.catbox.moe/c4lwfb.jpg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,7 +21,16 @@
         .table-glass tbody tr { background: rgba(255, 255, 255, 0.15); border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
         .loader { border: 4px solid rgba(255, 255, 255, 0.3); border-left-color: #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        #signature-canvas { border: 2px dashed rgba(255, 255, 255, 0.5); border-radius: 0.5rem; cursor: crosshair; }
+        
+        /* [DIUBAH] Style untuk kanvas tanda tangan */
+        #signature-canvas {
+            border: 1px solid #e2e8f0; /* Border abu-abu muda */
+            border-radius: 0.5rem;
+            cursor: crosshair;
+            background-color: #ffffff; /* Latar belakang putih solid */
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body class="text-gray-800">
@@ -35,7 +43,6 @@
     <div class="container mx-auto p-4 md:p-6 max-w-5xl">
         <!-- Header -->
         <header class="text-center mb-6">
-            <!-- [DIUBAH] URL Logo diperbarui -->
             <img src="https://files.catbox.moe/c4lwfb.jpg" alt="Logo RSUD" class="mx-auto h-24 w-24 rounded-full object-cover mb-4 shadow-lg border-4 border-white">
             <h1 class="text-3xl md:text-4xl font-bold text-white text-shadow">Aplikasi Morning Report</h1>
             <p class="text-white/80 mt-1">RSUD dr. R. Koesma Tuban</p>
@@ -100,8 +107,10 @@
                 <!-- Area Tanda Tangan -->
                 <div>
                     <label class="text-white/80 text-sm mb-1 block">Tanda Tangan di sini:</label>
-                    <div class="relative w-full h-40">
-                        <canvas id="signature-canvas" class="bg-white/20"></canvas>
+                    <!-- [DIUBAH] Wrapper untuk canvas agar responsif -->
+                    <div id="signature-pad-wrapper" class="relative w-full h-40">
+                        <!-- Class 'bg-white/20' dihapus, diatur via <style> -->
+                        <canvas id="signature-canvas"></canvas>
                     </div>
                     <button type="button" id="clear-signature-button" class="text-xs text-white/80 hover:text-white mt-1">Bersihkan</button>
                 </div>
@@ -151,7 +160,10 @@
             document.getElementById(id).classList.remove('hidden');
             document.getElementById(id).classList.add('flex');
             if (id === 'attendance-modal') {
-                initSignaturePad();
+                // [DIUBAH] Menunggu sesaat sebelum resize agar layout stabil
+                setTimeout(() => {
+                    resizeSignatureCanvas();
+                }, 100);
             }
         }
 
@@ -160,38 +172,49 @@
             document.getElementById(id).classList.remove('flex');
         }
         
-        function initSignaturePad() {
+        // [DIUBAH] Fungsi untuk resize canvas tanda tangan
+        function resizeSignatureCanvas() {
             const canvas = document.getElementById('signature-canvas');
+            const wrapper = document.getElementById('signature-pad-wrapper');
             const ratio =  Math.max(window.devicePixelRatio || 1, 1);
-            canvas.width = canvas.offsetWidth * ratio;
-            canvas.height = canvas.offsetHeight * ratio;
+            
+            // Atur ukuran logis canvas agar sama dengan wrapper
+            canvas.width = wrapper.offsetWidth * ratio;
+            canvas.height = wrapper.offsetHeight * ratio;
             canvas.getContext("2d").scale(ratio, ratio);
             
+            // Inisialisasi atau bersihkan signature pad
             if (signaturePad) {
                 signaturePad.clear();
+            } else {
+                signaturePad = new SignaturePad(canvas, {
+                    // [DIUBAH] Warna pena menjadi hitam karena background putih
+                    penColor: "rgb(0, 0, 0)" 
+                });
             }
-            signaturePad = new SignaturePad(canvas, {
-                penColor: "rgb(255, 255, 255)"
-            });
         }
-
-        // --- EVENT LISTENERS ---
-        document.addEventListener('DOMContentLoaded', async () => {
-            document.getElementById('clear-signature-button').addEventListener('click', () => {
-                if(signaturePad) signaturePad.clear();
-            });
+        
+        // [BARU] Listener untuk resize window (misal: rotasi HP)
+        window.addEventListener('resize', () => {
+            const modal = document.getElementById('attendance-modal');
+            // Jika modal kehadiran sedang tampil, resize canvas
+            if (!modal.classList.contains('hidden')) {
+                resizeSignatureCanvas();
+            }
         });
 
+        // --- EVENT LISTENERS ---
         document.getElementById('attendance-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             if (signaturePad.isEmpty()) {
-                alert("Mohon bubuhkan tanda tangan Anda.");
+                // Menggunakan custom toast, bukan alert()
+                showToast("Mohon bubuhkan tanda tangan Anda.", true);
                 return;
             }
 
             const form = e.target;
-            const signatureData = signaturePad.toDataURL();
+            const signatureData = signaturePad.toDataURL('image/png');
             
             const data = {
                 name: form.name.value,
@@ -236,7 +259,7 @@
             showLoader('attendance', false);
         }
 
-        // --- SISA KODE JAVASCRIPT (TIDAK BERUBAH) ---
+        // --- SISA KODE JAVASCRIPT ---
         function showToast(message, isError = false) { const toast = document.getElementById('toast'); const toastMessage = document.getElementById('toast-message'); toastMessage.textContent = message; toast.classList.remove('hidden', 'bg-red-500/50', 'translate-y-20'); toast.classList.add(isError ? 'bg-red-500/50' : 'glass-card'); setTimeout(() => { toast.classList.add('translate-y-20'); setTimeout(() => toast.classList.add('hidden'), 500); }, 3000); }
         function showLoader(containerId, show = true) { const loader = document.getElementById(containerId + '-loader'); const table = document.getElementById(containerId + '-table'); if (loader) loader.style.display = show ? 'flex' : 'none'; if (table) table.style.display = show ? 'none' : 'table'; }
         async function callGAS(payload) { try { const response = await fetch(GAS_URL, { method: 'POST', mode: 'cors', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-t' }, body: JSON.stringify(payload) }); const result = await response.json(); if (result.status === 'error') { throw new Error(result.message); } return result.data; } catch (error) { console.error('Error calling GAS:', error); showToast('Terjadi kesalahan: ' + error.message, true); return null; } }
