@@ -58,7 +58,7 @@
 
         <!-- Main Content -->
         <main>
-            <!-- [DIUBAH] Jadwal Kegiatan -->
+            <!-- Jadwal Kegiatan -->
             <div id="schedule-section" class="glass-card rounded-2xl py-4 md:p-6 mb-6 shadow-xl overflow-hidden">
                  <div class="flex justify-between items-center mb-4 px-4 md:px-0">
                     <h2 class="text-xl font-bold text-white">Jadwal Kegiatan</h2>
@@ -66,9 +66,10 @@
                         <i class="ph-fill ph-user-gear text-2xl text-white"></i>
                     </button>
                 </div>
-                <!-- Kontainer gambar dengan margin negatif untuk efek full-bleed di mobile -->
-                <div id="schedule-image-container" class="bg-black/20 min-h-[200px] flex items-center justify-center -mx-4 md:mx-0 md:rounded-lg">
-                    <img id="schedule-image" src="" alt="Jadwal Kegiatan" class="w-full h-auto hidden md:rounded-lg">
+                <!-- [DIUBAH] Kontainer gambar dengan tinggi maksimal -->
+                <div id="schedule-image-container" class="bg-black/20 min-h-[200px] max-h-[70vh] flex items-center justify-center -mx-4 md:mx-0 md:rounded-lg">
+                    <!-- [DIUBAH] Gambar menggunakan object-contain agar tidak terpotong -->
+                    <img id="schedule-image" src="" alt="Jadwal Kegiatan" class="w-full h-full object-contain hidden md:rounded-lg">
                     <p id="no-schedule-text" class="text-white/70">Jadwal belum tersedia.</p>
                 </div>
                 <div id="admin-panel" class="hidden mt-4 px-4 md:px-0">
