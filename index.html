@@ -66,10 +66,8 @@
                         <i class="ph-fill ph-user-gear text-2xl text-white"></i>
                     </button>
                 </div>
-                <!-- [DIUBAH] Kontainer gambar dengan tinggi maksimal -->
                 <div id="schedule-image-container" class="bg-black/20 min-h-[200px] max-h-[70vh] flex items-center justify-center -mx-4 md:mx-0 md:rounded-lg">
-                    <!-- [DIUBAH] Gambar menggunakan object-contain agar tidak terpotong -->
-                    <img id="schedule-image" src="" alt="Jadwal Kegiatan" class="w-full h-full object-contain hidden md:rounded-lg">
+                    <img id="schedule-image" src="" alt="Jadwal Kegiatan" class="w-full h-full object-contain hidden md:rounded-lg cursor-pointer">
                     <p id="no-schedule-text" class="text-white/70">Jadwal belum tersedia.</p>
                 </div>
                 <div id="admin-panel" class="hidden mt-4 px-4 md:px-0">
@@ -110,7 +108,7 @@
         </footer>
     </div>
 
-    <!-- Modals (Konten tidak berubah, hanya memastikan ada) -->
+    <!-- Modals -->
     <div id="attendance-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
         <div class="glass-card rounded-2xl p-6 w-11/12 max-w-md shadow-2xl">
             <h3 class="text-xl font-bold text-white mb-4">Input Daftar Hadir</h3>
@@ -194,6 +192,12 @@
             </div>
             <button type="button" onclick="hideModal('archive-modal')" class="bg-red-500/50 hover:bg-red-500/80 w-full mt-4 py-2 px-4 rounded-lg text-white font-semibold transition">Tutup</button>
         </div>
+    </div>
+    <div id="fullscreen-image-modal" class="fixed inset-0 z-[60] hidden items-center justify-center modal-backdrop" onclick="hideModal('fullscreen-image-modal')">
+        <button class="absolute top-4 right-4 text-white text-4xl z-10" onclick="hideModal('fullscreen-image-modal')">
+            <i class="ph-bold ph-x-circle"></i>
+        </button>
+        <img id="fullscreen-image-content" src="" alt="Jadwal Fullscreen" class="max-w-[95vw] max-h-[95vh] object-contain" onclick="event.stopPropagation()">
     </div>
     <div id="toast" class="fixed bottom-5 right-5 z-50 glass-card p-4 rounded-lg shadow-2xl hidden transform translate-y-20 transition-transform duration-500">
         <p id="toast-message" class="text-white font-semibold"></p>
@@ -514,6 +518,17 @@
                     const form = document.getElementById('attendance-form');
                     if (form && attendeeRecord) {
                         form.unit.value = attendeeRecord.unit;
+                    }
+                });
+            }
+
+            const scheduleImage = document.getElementById('schedule-image');
+            if (scheduleImage) {
+                scheduleImage.addEventListener('click', () => {
+                    const fullscreenImageContent = document.getElementById('fullscreen-image-content');
+                    if (fullscreenImageContent && scheduleImage.src) {
+                        fullscreenImageContent.src = scheduleImage.src;
+                        showModal('fullscreen-image-modal');
                     }
                 });
             }
