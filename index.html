@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Morning Report - RSUD dr. R. Koesma</title>
+    <!-- [DIUBAH] Favicon ditambahkan -->
+    <link rel="icon" type="image/jpeg" href="https://files.catbox.moe/c4lwfb.jpg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <!-- [BARU] Library untuk Tanda Tangan -->
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%); background-attachment: fixed; }
@@ -21,7 +22,6 @@
         .table-glass tbody tr { background: rgba(255, 255, 255, 0.15); border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
         .loader { border: 4px solid rgba(255, 255, 255, 0.3); border-left-color: #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        /* [BARU] Style untuk kanvas tanda tangan */
         #signature-canvas { border: 2px dashed rgba(255, 255, 255, 0.5); border-radius: 0.5rem; cursor: crosshair; }
     </style>
 </head>
@@ -35,7 +35,8 @@
     <div class="container mx-auto p-4 md:p-6 max-w-5xl">
         <!-- Header -->
         <header class="text-center mb-6">
-            <img src="https://placehold.co/150x150/ffffff/66a6ff?text=Logo+RSUD" alt="Logo RSUD" class="mx-auto h-24 w-24 rounded-full object-cover mb-4 shadow-lg border-4 border-white">
+            <!-- [DIUBAH] URL Logo diperbarui -->
+            <img src="https://files.catbox.moe/c4lwfb.jpg" alt="Logo RSUD" class="mx-auto h-24 w-24 rounded-full object-cover mb-4 shadow-lg border-4 border-white">
             <h1 class="text-3xl md:text-4xl font-bold text-white text-shadow">Aplikasi Morning Report</h1>
             <p class="text-white/80 mt-1">RSUD dr. R. Koesma Tuban</p>
         </header>
@@ -87,7 +88,7 @@
         </main>
     </div>
 
-    <!-- [DIUBAH] Modal Input Hadir dengan Tanda Tangan -->
+    <!-- Modal Input Hadir dengan Tanda Tangan -->
     <div id="attendance-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
         <div class="glass-card rounded-2xl p-6 w-11/12 max-w-md shadow-2xl">
             <h3 class="text-xl font-bold text-white mb-4">Input Daftar Hadir</h3>
@@ -113,7 +114,7 @@
         </div>
     </div>
 
-    <!-- [DIUBAH] Modal View Hadir dengan Tanda Tangan -->
+    <!-- Modal View Hadir dengan Tanda Tangan -->
     <div id="view-attendance-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
         <div class="glass-card rounded-2xl p-6 w-11/12 max-w-4xl shadow-2xl max-h-[80vh] flex flex-col">
             <h3 class="text-xl font-bold text-white mb-4">Daftar Kehadiran</h3>
@@ -143,13 +144,12 @@
         // --- KONFIGURASI FRONTEND ---
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbya-XiYph0VQXjgNLfWXQ-qmkk7q4HcU7N6g0x-PCIvrMHhILl9p-_aNUWd-zOUdAWH/exec';
         let adminPassword = null;
-        let signaturePad; // [BARU] Variabel untuk signature pad
+        let signaturePad;
 
         // --- HELPER FUNCTIONS ---
         function showModal(id) {
             document.getElementById(id).classList.remove('hidden');
             document.getElementById(id).classList.add('flex');
-            // [BARU] Inisialisasi atau resize signature pad saat modalnya tampil
             if (id === 'attendance-modal') {
                 initSignaturePad();
             }
@@ -160,17 +160,15 @@
             document.getElementById(id).classList.remove('flex');
         }
         
-        // [BARU] Fungsi untuk inisialisasi signature pad
         function initSignaturePad() {
             const canvas = document.getElementById('signature-canvas');
-            // Sesuaikan ukuran canvas dengan parent-nya
             const ratio =  Math.max(window.devicePixelRatio || 1, 1);
             canvas.width = canvas.offsetWidth * ratio;
             canvas.height = canvas.offsetHeight * ratio;
             canvas.getContext("2d").scale(ratio, ratio);
             
             if (signaturePad) {
-                signaturePad.clear(); // Hapus yang lama jika ada
+                signaturePad.clear();
             }
             signaturePad = new SignaturePad(canvas, {
                 penColor: "rgb(255, 255, 255)"
@@ -179,14 +177,11 @@
 
         // --- EVENT LISTENERS ---
         document.addEventListener('DOMContentLoaded', async () => {
-            // Inisialisasi tombol clear
             document.getElementById('clear-signature-button').addEventListener('click', () => {
                 if(signaturePad) signaturePad.clear();
             });
-            // ... (kode lainnya tetap sama)
         });
 
-        // [DIUBAH] Event listener untuk form kehadiran
         document.getElementById('attendance-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -196,13 +191,13 @@
             }
 
             const form = e.target;
-            const signatureData = signaturePad.toDataURL(); // Ambil data sebagai base64
+            const signatureData = signaturePad.toDataURL();
             
             const data = {
                 name: form.name.value,
                 nip: form.nip.value,
                 unit: form.unit.value,
-                signature: signatureData // Kirim data tanda tangan
+                signature: signatureData
             };
 
             showToast('Mengirim data kehadiran...');
@@ -212,11 +207,10 @@
             if (result) {
                 showToast(result.message);
                 form.reset();
-                signaturePad.clear(); // Bersihkan canvas setelah kirim
+                signaturePad.clear();
             }
         });
 
-        // [DIUBAH] Fungsi untuk menampilkan daftar kehadiran
         async function getAttendance() {
             showLoader('attendance', true);
             const data = await callGAS({ action: 'getAttendanceList' });
@@ -224,7 +218,6 @@
             tbody.innerHTML = '';
             if (data && data.length > 0) {
                 data.reverse().forEach(row => {
-                    // Tampilkan link "Lihat" jika ada URL tanda tangan
                     const signatureCell = row.signatureUrl 
                         ? `<a href="${row.signatureUrl}" target="_blank" class="text-sky-300 hover:text-sky-100">Lihat</a>`
                         : 'Tidak ada';
@@ -244,8 +237,6 @@
         }
 
         // --- SISA KODE JAVASCRIPT (TIDAK BERUBAH) ---
-        // (Salin sisa kode JavaScript dari versi sebelumnya ke sini)
-        // ... (fungsi showToast, showLoader, callGAS, event listeners lain, dll)
         function showToast(message, isError = false) { const toast = document.getElementById('toast'); const toastMessage = document.getElementById('toast-message'); toastMessage.textContent = message; toast.classList.remove('hidden', 'bg-red-500/50', 'translate-y-20'); toast.classList.add(isError ? 'bg-red-500/50' : 'glass-card'); setTimeout(() => { toast.classList.add('translate-y-20'); setTimeout(() => toast.classList.add('hidden'), 500); }, 3000); }
         function showLoader(containerId, show = true) { const loader = document.getElementById(containerId + '-loader'); const table = document.getElementById(containerId + '-table'); if (loader) loader.style.display = show ? 'flex' : 'none'; if (table) table.style.display = show ? 'none' : 'table'; }
         async function callGAS(payload) { try { const response = await fetch(GAS_URL, { method: 'POST', mode: 'cors', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-t' }, body: JSON.stringify(payload) }); const result = await response.json(); if (result.status === 'error') { throw new Error(result.message); } return result.data; } catch (error) { console.error('Error calling GAS:', error); showToast('Terjadi kesalahan: ' + error.message, true); return null; } }
