@@ -22,9 +22,25 @@
         .loader { border: 4px solid rgba(255, 255, 255, 0.3); border-left-color: #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         #signature-canvas { border: 1px solid #e2e8f0; border-radius: 0.5rem; cursor: crosshair; background-color: #ffffff; width: 100%; height: 100%; }
+        
+        #sticky-header {
+            transform: translateY(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        #sticky-header.show {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body class="text-gray-800">
+
+    <!-- Sticky Header -->
+    <div id="sticky-header" class="fixed top-0 left-0 w-full z-40 glass-card shadow-lg">
+        <div class="container mx-auto px-4 py-2 flex items-center">
+            <img src="https://files.catbox.moe/c4lwfb.jpg" alt="Logo RSUD Kecil" class="h-12 w-12 rounded-full object-cover">
+            <h2 class="ml-4 text-lg font-bold text-white">Aplikasi Morning Report</h2>
+        </div>
+    </div>
 
     <div id="app-loader" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-sky-500">
         <div class="loader"></div>
@@ -32,9 +48,9 @@
     </div>
 
     <div class="container mx-auto p-4 md:p-6 max-w-5xl">
-        <!-- Header -->
-        <header class="text-center mb-6">
-            <img src="https://files.catbox.moe/c4lwfb.jpg" alt="Logo RSUD" class="mx-auto h-24 w-24 rounded-full object-cover mb-4 shadow-lg border-4 border-white">
+        <!-- Header Utama -->
+        <header class="text-center pt-8 mb-6">
+            <img src="https://files.catbox.moe/c4lwfb.jpg" alt="Logo RSUD" class="mx-auto h-24 w-24 rounded-full object-cover mb-4 shadow-lg">
             <h1 class="text-3xl md:text-4xl font-bold text-white text-shadow">Aplikasi Morning Report</h1>
             <p class="text-white/80 mt-1">RSUD dr. R. Koesma Tuban</p>
         </header>
@@ -91,8 +107,8 @@
         </footer>
     </div>
 
-    <!-- Modal Input Hadir dengan Tanda Tangan -->
-    <div id="attendance-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
+    <!-- Modals -->
+    <div id="attendance-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
         <div class="glass-card rounded-2xl p-6 w-11/12 max-w-md shadow-2xl">
             <h3 class="text-xl font-bold text-white mb-4">Input Daftar Hadir</h3>
             <form id="attendance-form" class="space-y-4">
@@ -113,9 +129,7 @@
             </form>
         </div>
     </div>
-
-    <!-- Modal View Hadir -->
-    <div id="view-attendance-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
+    <div id="view-attendance-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
         <div class="glass-card rounded-2xl p-6 w-11/12 max-w-4xl shadow-2xl max-h-[80vh] flex flex-col">
             <h3 class="text-xl font-bold text-white mb-4">Daftar Kehadiran</h3>
             <div id="attendance-list-container" class="overflow-auto flex-grow">
@@ -132,9 +146,7 @@
             <button type="button" onclick="hideModal('view-attendance-modal')" class="bg-red-500/50 hover:bg-red-500/80 w-full mt-4 py-2 px-4 rounded-lg text-white font-semibold transition">Tutup</button>
         </div>
     </div>
-
-    <!-- Admin Login Modal -->
-    <div id="admin-login-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
+    <div id="admin-login-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
         <div class="glass-card rounded-2xl p-6 w-11/12 max-w-sm shadow-2xl">
             <h3 class="text-xl font-bold text-white mb-4">Login Admin</h3>
             <input type="password" id="admin-password-input" placeholder="Masukkan password admin" class="w-full p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-white">
@@ -144,9 +156,7 @@
             </div>
         </div>
     </div>
-
-    <!-- Upload Report Modal -->
-    <div id="upload-report-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
+    <div id="upload-report-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
         <div class="glass-card rounded-2xl p-6 w-11/12 max-w-md shadow-2xl">
             <h3 class="text-xl font-bold text-white mb-4">Upload Bahan Laporan</h3>
             <form id="upload-report-form" class="space-y-4">
@@ -159,9 +169,7 @@
             </form>
         </div>
     </div>
-
-    <!-- Archive Modal -->
-    <div id="archive-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
+    <div id="archive-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
         <div class="glass-card rounded-2xl p-6 w-11/12 max-w-4xl shadow-2xl max-h-[80vh] flex flex-col">
             <h3 class="text-xl font-bold text-white mb-4">Arsip Laporan</h3>
             <div id="archive-list-container" class="overflow-auto flex-grow">
@@ -176,9 +184,7 @@
             <button type="button" onclick="hideModal('archive-modal')" class="bg-red-500/50 hover:bg-red-500/80 w-full mt-4 py-2 px-4 rounded-lg text-white font-semibold transition">Tutup</button>
         </div>
     </div>
-
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-5 right-5 glass-card p-4 rounded-lg shadow-2xl hidden transform translate-y-20 transition-transform duration-500">
+    <div id="toast" class="fixed bottom-5 right-5 z-50 glass-card p-4 rounded-lg shadow-2xl hidden transform translate-y-20 transition-transform duration-500">
         <p id="toast-message" class="text-white font-semibold"></p>
     </div>
 
@@ -191,21 +197,22 @@
 
         // --- FUNGSI HELPER ---
         function showModal(id) {
-            document.getElementById(id).classList.remove('hidden');
-            document.getElementById(id).classList.add('flex');
+            document.getElementById(id)?.classList.remove('hidden');
+            document.getElementById(id)?.classList.add('flex');
             if (id === 'attendance-modal') {
                 setTimeout(() => { resizeSignatureCanvas(); }, 100);
             }
         }
 
         function hideModal(id) {
-            document.getElementById(id).classList.add('hidden');
-            document.getElementById(id).classList.remove('flex');
+            document.getElementById(id)?.classList.add('hidden');
+            document.getElementById(id)?.classList.remove('flex');
         }
 
         function resizeSignatureCanvas() {
             const canvas = document.getElementById('signature-canvas');
             const wrapper = document.getElementById('signature-pad-wrapper');
+            if (!canvas || !wrapper) return;
             const ratio =  Math.max(window.devicePixelRatio || 1, 1);
             canvas.width = wrapper.offsetWidth * ratio;
             canvas.height = wrapper.offsetHeight * ratio;
@@ -220,6 +227,7 @@
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toast-message');
+            if (!toast || !toastMessage) return;
             toastMessage.textContent = message;
             toast.classList.remove('hidden', 'bg-red-500/50', 'translate-y-20');
             toast.classList.add(isError ? 'bg-red-500/50' : 'glass-card');
@@ -261,6 +269,7 @@
             showLoader('attendance', true);
             const data = await callGAS({ action: 'getAttendanceList' });
             const tbody = document.getElementById('attendance-table-body');
+            if (!tbody) return;
             tbody.innerHTML = '';
             if (data && data.length > 0) {
                 data.reverse().forEach(row => {
@@ -277,6 +286,7 @@
             showLoader('archive', true);
             const data = await callGAS({ action: 'getArchiveList' });
             const tbody = document.getElementById('archive-table-body');
+            if (!tbody) return;
             tbody.innerHTML = '';
             if (data && data.length > 0) {
                 data.reverse().forEach(row => {
@@ -290,6 +300,7 @@
 
         async function handleAdminLogin() {
             const passwordInput = document.getElementById('admin-password-input');
+            if (!passwordInput) return;
             const pass = passwordInput.value;
             if (!pass) {
                 showToast('Password tidak boleh kosong.', true);
@@ -300,7 +311,7 @@
                 adminPassword = pass;
                 showToast('Login admin berhasil!');
                 hideModal('admin-login-modal');
-                document.getElementById('admin-panel').classList.remove('hidden');
+                document.getElementById('admin-panel')?.classList.remove('hidden');
                 passwordInput.value = '';
             } else {
                 showToast(result.message || 'Login gagal.', true);
@@ -323,14 +334,14 @@
                 img.classList.remove('hidden');
                 document.getElementById('no-schedule-text').classList.add('hidden');
             }
-            appLoader.style.display = 'none';
+            if(appLoader) appLoader.style.display = 'none';
 
             // Pasang semua event listener di sini
-            document.getElementById('clear-signature-button').addEventListener('click', () => {
+            document.getElementById('clear-signature-button')?.addEventListener('click', () => {
                 if(signaturePad) signaturePad.clear();
             });
 
-            document.getElementById('attendance-form').addEventListener('submit', async (e) => {
+            document.getElementById('attendance-form')?.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 if (signaturePad.isEmpty()) {
                     showToast("Mohon bubuhkan tanda tangan Anda.", true);
@@ -349,7 +360,7 @@
                 }
             });
 
-            document.getElementById('upload-report-form').addEventListener('submit', async (e) => {
+            document.getElementById('upload-report-form')?.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const form = e.target;
                 const file = form.file.files[0];
@@ -372,19 +383,19 @@
                 reader.readAsDataURL(file);
             });
 
-            document.getElementById('admin-login-button').addEventListener('click', () => {
+            document.getElementById('admin-login-button')?.addEventListener('click', () => {
                 if (adminPassword) {
-                    document.getElementById('admin-panel').classList.toggle('hidden');
+                    document.getElementById('admin-panel')?.classList.toggle('hidden');
                 } else {
                     showModal('admin-login-modal');
                 }
             });
             
-            // Mengganti onclick di HTML dengan addEventListener
-            document.getElementById('login-submit-button').addEventListener('click', handleAdminLogin);
+            document.getElementById('login-submit-button')?.addEventListener('click', handleAdminLogin);
 
-            document.getElementById('upload-schedule-button').addEventListener('click', async () => {
+            document.getElementById('upload-schedule-button')?.addEventListener('click', async () => {
                 const fileInput = document.getElementById('schedule-file-input');
+                if (!fileInput) return;
                 const file = fileInput.files[0];
                 if (!file) {
                     showToast('Pilih file gambar jadwal terlebih dahulu.', true);
@@ -399,9 +410,11 @@
                     if (result) {
                         showToast(result.message);
                         const img = document.getElementById('schedule-image');
-                        img.src = result.newImageUrl;
-                        img.classList.remove('hidden');
-                        document.getElementById('no-schedule-text').classList.add('hidden');
+                        if (img) {
+                            img.src = result.newImageUrl;
+                            img.classList.remove('hidden');
+                        }
+                        document.getElementById('no-schedule-text')?.classList.add('hidden');
                         fileInput.value = '';
                     }
                 };
@@ -409,9 +422,20 @@
             });
         });
 
+        window.addEventListener('scroll', () => {
+            const stickyHeader = document.getElementById('sticky-header');
+            if (stickyHeader) {
+                if (window.scrollY > 100) {
+                    stickyHeader.classList.add('show');
+                } else {
+                    stickyHeader.classList.remove('show');
+                }
+            }
+        });
+
         window.addEventListener('resize', () => {
             const modal = document.getElementById('attendance-modal');
-            if (!modal.classList.contains('hidden')) {
+            if (modal && !modal.classList.contains('hidden')) {
                 resizeSignatureCanvas();
             }
         });
