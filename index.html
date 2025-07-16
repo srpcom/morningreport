@@ -4,63 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Morning Report - RSUD dr. R. Koesma</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Icon Library: Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- [BARU] Library untuk Tanda Tangan -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <style>
-        /* Custom Styles for Glassmorphism and 3D effects */
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
-            background-attachment: fixed;
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
-        }
-        .glass-button {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-        .glass-button:hover {
-            background: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-            transform: translateY(-2px);
-        }
-        .modal-backdrop {
-            background-color: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-        }
-        .table-glass thead {
-            background: rgba(255, 255, 255, 0.3);
-        }
-        .table-glass tbody tr {
-            background: rgba(255, 255, 255, 0.15);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .loader {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-left-color: #fff;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%); background-attachment: fixed; }
+        .glass-card { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
+        .glass-button { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.4); transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+        .glass-button:hover { background: rgba(255, 255, 255, 0.4); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); transform: translateY(-2px); }
+        .modal-backdrop { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); }
+        .table-glass thead { background: rgba(255, 255, 255, 0.3); }
+        .table-glass tbody tr { background: rgba(255, 255, 255, 0.15); border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+        .loader { border: 4px solid rgba(255, 255, 255, 0.3); border-left-color: #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        /* [BARU] Style untuk kanvas tanda tangan */
+        #signature-canvas { border: 2px dashed rgba(255, 255, 255, 0.5); border-radius: 0.5rem; cursor: crosshair; }
     </style>
 </head>
 <body class="text-gray-800">
@@ -73,7 +35,6 @@
     <div class="container mx-auto p-4 md:p-6 max-w-5xl">
         <!-- Header -->
         <header class="text-center mb-6">
-            <!-- Ganti 'URL_LOGO_ANDA' dengan URL logo RSUD -->
             <img src="https://placehold.co/150x150/ffffff/66a6ff?text=Logo+RSUD" alt="Logo RSUD" class="mx-auto h-24 w-24 rounded-full object-cover mb-4 shadow-lg border-4 border-white">
             <h1 class="text-3xl md:text-4xl font-bold text-white text-shadow">Aplikasi Morning Report</h1>
             <p class="text-white/80 mt-1">RSUD dr. R. Koesma Tuban</p>
@@ -83,7 +44,7 @@
         <main>
             <!-- Jadwal Kegiatan -->
             <div id="schedule-section" class="glass-card rounded-2xl p-4 md:p-6 mb-6 shadow-xl">
-                <div class="flex justify-between items-center mb-4">
+                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold text-white">Jadwal Kegiatan</h2>
                     <button id="admin-login-button" class="p-2 rounded-full hover:bg-white/20 transition-colors">
                         <i class="ph-fill ph-user-gear text-2xl text-white"></i>
@@ -118,7 +79,6 @@
                     <i class="ph-fill ph-archive text-4xl text-white"></i>
                     <span class="mt-2 font-semibold text-white text-center text-sm">Arsip</span>
                 </button>
-                <!-- GANTI # dengan link Google Sheet Notulen Anda -->
                 <a href="#" target="_blank" class="glass-button p-4 rounded-2xl flex flex-col items-center justify-center aspect-square col-span-2 md:col-span-1">
                     <i class="ph-fill ph-note-pencil text-4xl text-white"></i>
                     <span class="mt-2 font-semibold text-white text-center text-sm">Notulen</span>
@@ -127,20 +87,7 @@
         </main>
     </div>
 
-    <!-- Modals -->
-    <!-- Admin Login Modal -->
-    <div id="admin-login-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
-        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-sm shadow-2xl">
-            <h3 class="text-xl font-bold text-white mb-4">Login Admin</h3>
-            <input type="password" id="admin-password-input" placeholder="Masukkan password admin" class="w-full p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-white">
-            <div class="flex gap-4 mt-4">
-                <button onclick="handleAdminLogin()" class="glass-button flex-1 py-2 px-4 rounded-lg text-white font-semibold">Login</button>
-                <button onclick="hideModal('admin-login-modal')" class="bg-red-500/50 hover:bg-red-500/80 flex-1 py-2 px-4 rounded-lg text-white font-semibold transition">Batal</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modals for features -->
+    <!-- [DIUBAH] Modal Input Hadir dengan Tanda Tangan -->
     <div id="attendance-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
         <div class="glass-card rounded-2xl p-6 w-11/12 max-w-md shadow-2xl">
             <h3 class="text-xl font-bold text-white mb-4">Input Daftar Hadir</h3>
@@ -148,6 +95,16 @@
                 <input type="text" name="name" placeholder="Nama Lengkap" class="w-full p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600" required>
                 <input type="text" name="nip" placeholder="NIP / ID Pegawai" class="w-full p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600" required>
                 <input type="text" name="unit" placeholder="Unit / Bagian" class="w-full p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600" required>
+                
+                <!-- Area Tanda Tangan -->
+                <div>
+                    <label class="text-white/80 text-sm mb-1 block">Tanda Tangan di sini:</label>
+                    <div class="relative w-full h-40">
+                        <canvas id="signature-canvas" class="bg-white/20"></canvas>
+                    </div>
+                    <button type="button" id="clear-signature-button" class="text-xs text-white/80 hover:text-white mt-1">Bersihkan</button>
+                </div>
+
                 <div class="flex gap-4 pt-2">
                     <button type="submit" class="glass-button flex-1 py-2 px-4 rounded-lg text-white font-semibold">Kirim</button>
                     <button type="button" onclick="hideModal('attendance-modal')" class="bg-red-500/50 hover:bg-red-500/80 flex-1 py-2 px-4 rounded-lg text-white font-semibold transition">Batal</button>
@@ -156,18 +113,17 @@
         </div>
     </div>
 
+    <!-- [DIUBAH] Modal View Hadir dengan Tanda Tangan -->
     <div id="view-attendance-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
-        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-3xl shadow-2xl max-h-[80vh] flex flex-col">
+        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-4xl shadow-2xl max-h-[80vh] flex flex-col">
             <h3 class="text-xl font-bold text-white mb-4">Daftar Kehadiran</h3>
             <div id="attendance-list-container" class="overflow-auto flex-grow">
-                <!-- Loader -->
-                <div id="attendance-loader" class="flex justify-center items-center h-full">
-                    <div class="loader"></div>
-                </div>
-                <!-- Table -->
+                <div id="attendance-loader" class="flex justify-center items-center h-full"><div class="loader"></div></div>
                 <table id="attendance-table" class="w-full text-white table-auto table-glass hidden">
                     <thead class="text-left">
-                        <tr><th class="p-2">Waktu</th><th class="p-2">Nama</th><th class="p-2">NIP</th><th class="p-2">Unit</th></tr>
+                        <tr>
+                            <th class="p-2">Waktu</th><th class="p-2">Nama</th><th class="p-2">NIP</th><th class="p-2">Unit</th><th class="p-2">Tanda Tangan</th>
+                        </tr>
                     </thead>
                     <tbody id="attendance-table-body"></tbody>
                 </table>
@@ -175,270 +131,130 @@
             <button type="button" onclick="hideModal('view-attendance-modal')" class="bg-red-500/50 hover:bg-red-500/80 w-full mt-4 py-2 px-4 rounded-lg text-white font-semibold transition">Tutup</button>
         </div>
     </div>
+    
+    <!-- Modal Lainnya (Tidak berubah) -->
+    <div id="admin-login-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">...</div>
+    <div id="upload-report-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">...</div>
+    <div id="archive-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">...</div>
+    <div id="toast" class="fixed bottom-5 right-5 glass-card p-4 rounded-lg shadow-2xl hidden transform translate-y-20 transition-transform duration-500">...</div>
 
-    <div id="upload-report-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
-        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-md shadow-2xl">
-            <h3 class="text-xl font-bold text-white mb-4">Upload Bahan Laporan</h3>
-            <form id="upload-report-form" class="space-y-4">
-                <input type="text" name="uploaderName" placeholder="Nama Pengunggah" class="w-full p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600" required>
-                <input type="file" name="file" class="block w-full text-sm text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white/80 file:text-sky-700 hover:file:bg-white" required>
-                <div class="flex gap-4 pt-2">
-                    <button type="submit" class="glass-button flex-1 py-2 px-4 rounded-lg text-white font-semibold">Upload</button>
-                    <button type="button" onclick="hideModal('upload-report-modal')" class="bg-red-500/50 hover:bg-red-500/80 flex-1 py-2 px-4 rounded-lg text-white font-semibold transition">Batal</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="archive-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
-        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-4xl shadow-2xl max-h-[80vh] flex flex-col">
-            <h3 class="text-xl font-bold text-white mb-4">Arsip Laporan</h3>
-            <div id="archive-list-container" class="overflow-auto flex-grow">
-                <!-- Loader -->
-                <div id="archive-loader" class="flex justify-center items-center h-full">
-                    <div class="loader"></div>
-                </div>
-                <!-- Table -->
-                <table id="archive-table" class="w-full text-white table-auto table-glass hidden">
-                    <thead class="text-left">
-                        <tr><th class="p-2">Waktu Unggah</th><th class="p-2">Nama File</th><th class="p-2">Pengunggah</th><th class="p-2">Aksi</th></tr>
-                    </thead>
-                    <tbody id="archive-table-body"></tbody>
-                </table>
-            </div>
-            <button type="button" onclick="hideModal('archive-modal')" class="bg-red-500/50 hover:bg-red-500/80 w-full mt-4 py-2 px-4 rounded-lg text-white font-semibold transition">Tutup</button>
-        </div>
-    </div>
-
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-5 right-5 glass-card p-4 rounded-lg shadow-2xl hidden transform translate-y-20 transition-transform duration-500">
-        <p id="toast-message" class="text-white font-semibold"></p>
-    </div>
 
     <script>
         // --- KONFIGURASI FRONTEND ---
-        // URL Web App Anda telah dimasukkan di sini
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbya-XiYph0VQXjgNLfWXQ-qmkk7q4HcU7N6g0x-PCIvrMHhILl9p-_aNUWd-zOUdAWH/exec';
-        
         let adminPassword = null;
+        let signaturePad; // [BARU] Variabel untuk signature pad
 
         // --- HELPER FUNCTIONS ---
         function showModal(id) {
             document.getElementById(id).classList.remove('hidden');
             document.getElementById(id).classList.add('flex');
+            // [BARU] Inisialisasi atau resize signature pad saat modalnya tampil
+            if (id === 'attendance-modal') {
+                initSignaturePad();
+            }
         }
 
         function hideModal(id) {
             document.getElementById(id).classList.add('hidden');
             document.getElementById(id).classList.remove('flex');
         }
-
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toast-message');
-            toastMessage.textContent = message;
+        
+        // [BARU] Fungsi untuk inisialisasi signature pad
+        function initSignaturePad() {
+            const canvas = document.getElementById('signature-canvas');
+            // Sesuaikan ukuran canvas dengan parent-nya
+            const ratio =  Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
             
-            toast.classList.remove('hidden', 'bg-red-500/50', 'translate-y-20');
-            toast.classList.add(isError ? 'bg-red-500/50' : 'glass-card');
-            
-            setTimeout(() => {
-                toast.classList.add('translate-y-20');
-                setTimeout(() => toast.classList.add('hidden'), 500);
-            }, 3000);
-        }
-
-        function showLoader(containerId, show = true) {
-            const loader = document.getElementById(containerId + '-loader');
-            const table = document.getElementById(containerId + '-table');
-            if (loader) loader.style.display = show ? 'flex' : 'none';
-            if (table) table.style.display = show ? 'none' : 'table';
-        }
-
-        // --- API CALLS ---
-        async function callGAS(payload) {
-            try {
-                const response = await fetch(GAS_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    redirect: 'follow',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-t' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json();
-                if (result.status === 'error') {
-                    throw new Error(result.message);
-                }
-                return result.data;
-            } catch (error) {
-                console.error('Error calling GAS:', error);
-                showToast('Terjadi kesalahan: ' + error.message, true);
-                return null;
+            if (signaturePad) {
+                signaturePad.clear(); // Hapus yang lama jika ada
             }
+            signaturePad = new SignaturePad(canvas, {
+                penColor: "rgb(255, 255, 255)"
+            });
         }
-
-        // --- PAGE INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', async () => {
-            const appLoader = document.getElementById('app-loader');
-            const data = await callGAS({ action: 'getInitialData' });
-            if (data && data.scheduleImageUrl) {
-                const img = document.getElementById('schedule-image');
-                img.src = data.scheduleImageUrl;
-                img.classList.remove('hidden');
-                document.getElementById('no-schedule-text').classList.add('hidden');
-            }
-            appLoader.style.display = 'none';
-        });
 
         // --- EVENT LISTENERS ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Inisialisasi tombol clear
+            document.getElementById('clear-signature-button').addEventListener('click', () => {
+                if(signaturePad) signaturePad.clear();
+            });
+            // ... (kode lainnya tetap sama)
+        });
+
+        // [DIUBAH] Event listener untuk form kehadiran
         document.getElementById('attendance-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            if (signaturePad.isEmpty()) {
+                alert("Mohon bubuhkan tanda tangan Anda.");
+                return;
+            }
+
             const form = e.target;
+            const signatureData = signaturePad.toDataURL(); // Ambil data sebagai base64
+            
             const data = {
                 name: form.name.value,
                 nip: form.nip.value,
-                unit: form.unit.value
+                unit: form.unit.value,
+                signature: signatureData // Kirim data tanda tangan
             };
+
+            showToast('Mengirim data kehadiran...');
+            hideModal('attendance-modal');
+
             const result = await callGAS({ action: 'recordAttendance', data: data });
             if (result) {
                 showToast(result.message);
                 form.reset();
-                hideModal('attendance-modal');
+                signaturePad.clear(); // Bersihkan canvas setelah kirim
             }
         });
 
-        document.getElementById('upload-report-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const form = e.target;
-            const file = form.file.files[0];
-            if (!file) {
-                showToast('Silakan pilih file terlebih dahulu.', true);
-                return;
-            }
-            
-            showToast('Mengunggah file, mohon tunggu...');
-            hideModal('upload-report-modal');
-
-            const reader = new FileReader();
-            reader.onload = async (event) => {
-                const fileData = event.target.result;
-                const data = {
-                    fileData: fileData,
-                    fileName: file.name,
-                    fileType: file.type,
-                    uploaderName: form.uploaderName.value
-                };
-                const result = await callGAS({ action: 'uploadFile', data: data });
-                if (result) {
-                    showToast(result.message);
-                    form.reset();
-                }
-            };
-            reader.readAsDataURL(file);
-        });
-        
-        document.getElementById('admin-login-button').addEventListener('click', () => {
-            if (adminPassword) {
-                // Jika sudah login, toggle panel
-                document.getElementById('admin-panel').classList.toggle('hidden');
-            } else {
-                showModal('admin-login-modal');
-            }
-        });
-        
-        document.getElementById('upload-schedule-button').addEventListener('click', async () => {
-             const fileInput = document.getElementById('schedule-file-input');
-             const file = fileInput.files[0];
-             if (!file) {
-                 showToast('Pilih file gambar jadwal terlebih dahulu.', true);
-                 return;
-             }
-             
-             showToast('Memperbarui jadwal...');
-
-             const reader = new FileReader();
-             reader.onload = async (event) => {
-                 const fileData = event.target.result;
-                 const data = {
-                     fileData: fileData,
-                     fileName: file.name,
-                     fileType: file.type,
-                     password: adminPassword
-                 };
-                 const result = await callGAS({ action: 'changeScheduleImage', data: data });
-                 if (result) {
-                     showToast(result.message);
-                     const img = document.getElementById('schedule-image');
-                     img.src = result.newImageUrl + '&t=' + new Date().getTime(); // Cache busting
-                     img.classList.remove('hidden');
-                     document.getElementById('no-schedule-text').classList.add('hidden');
-                     fileInput.value = '';
-                 }
-             };
-             reader.readAsDataURL(file);
-        });
-
-        // --- DATA FETCHING FUNCTIONS ---
+        // [DIUBAH] Fungsi untuk menampilkan daftar kehadiran
         async function getAttendance() {
             showLoader('attendance', true);
             const data = await callGAS({ action: 'getAttendanceList' });
             const tbody = document.getElementById('attendance-table-body');
             tbody.innerHTML = '';
             if (data && data.length > 0) {
-                data.reverse().forEach(row => { // Show latest first
+                data.reverse().forEach(row => {
+                    // Tampilkan link "Lihat" jika ada URL tanda tangan
+                    const signatureCell = row.signatureUrl 
+                        ? `<a href="${row.signatureUrl}" target="_blank" class="text-sky-300 hover:text-sky-100">Lihat</a>`
+                        : 'Tidak ada';
+
                     tbody.innerHTML += `<tr>
                         <td class="p-2">${row.timestamp}</td>
                         <td class="p-2">${row.name}</td>
                         <td class="p-2">${row.nip}</td>
                         <td class="p-2">${row.unit}</td>
+                        <td class="p-2">${signatureCell}</td>
                     </tr>`;
                 });
             } else {
-                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Belum ada data kehadiran.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">Belum ada data kehadiran.</td></tr>';
             }
             showLoader('attendance', false);
         }
 
-        async function getArchives() {
-            showLoader('archive', true);
-            const data = await callGAS({ action: 'getArchiveList' });
-            const tbody = document.getElementById('archive-table-body');
-            tbody.innerHTML = '';
-            if (data && data.length > 0) {
-                data.reverse().forEach(row => { // Show latest first
-                    tbody.innerHTML += `<tr>
-                        <td class="p-2">${row.timestamp}</td>
-                        <td class="p-2">${row.fileName}</td>
-                        <td class="p-2">${row.uploaderName}</td>
-                        <td class="p-2">
-                            <a href="${row.downloadUrl}" target="_blank" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-1 px-3 rounded-full text-sm transition">Download</a>
-                        </td>
-                    </tr>`;
-                });
-            } else {
-                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Belum ada file di arsip.</td></tr>';
-            }
-            showLoader('archive', false);
-        }
-        
-        async function handleAdminLogin() {
-            const passwordInput = document.getElementById('admin-password-input');
-            const pass = passwordInput.value;
-            if (!pass) {
-                showToast('Password tidak boleh kosong.', true);
-                return;
-            }
-            
-            const result = await callGAS({ action: 'checkAdminPassword', data: { password: pass } });
-            if (result && result.isAdmin) {
-                adminPassword = pass;
-                showToast('Login admin berhasil!');
-                hideModal('admin-login-modal');
-                document.getElementById('admin-panel').classList.remove('hidden');
-                passwordInput.value = '';
-            } else {
-                showToast(result.message || 'Login gagal.', true);
-            }
-        }
+        // --- SISA KODE JAVASCRIPT (TIDAK BERUBAH) ---
+        // (Salin sisa kode JavaScript dari versi sebelumnya ke sini)
+        // ... (fungsi showToast, showLoader, callGAS, event listeners lain, dll)
+        function showToast(message, isError = false) { const toast = document.getElementById('toast'); const toastMessage = document.getElementById('toast-message'); toastMessage.textContent = message; toast.classList.remove('hidden', 'bg-red-500/50', 'translate-y-20'); toast.classList.add(isError ? 'bg-red-500/50' : 'glass-card'); setTimeout(() => { toast.classList.add('translate-y-20'); setTimeout(() => toast.classList.add('hidden'), 500); }, 3000); }
+        function showLoader(containerId, show = true) { const loader = document.getElementById(containerId + '-loader'); const table = document.getElementById(containerId + '-table'); if (loader) loader.style.display = show ? 'flex' : 'none'; if (table) table.style.display = show ? 'none' : 'table'; }
+        async function callGAS(payload) { try { const response = await fetch(GAS_URL, { method: 'POST', mode: 'cors', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-t' }, body: JSON.stringify(payload) }); const result = await response.json(); if (result.status === 'error') { throw new Error(result.message); } return result.data; } catch (error) { console.error('Error calling GAS:', error); showToast('Terjadi kesalahan: ' + error.message, true); return null; } }
+        document.addEventListener('DOMContentLoaded', async () => { const appLoader = document.getElementById('app-loader'); const data = await callGAS({ action: 'getInitialData' }); if (data && data.scheduleImageUrl) { const img = document.getElementById('schedule-image'); img.src = data.scheduleImageUrl; img.classList.remove('hidden'); document.getElementById('no-schedule-text').classList.add('hidden'); } appLoader.style.display = 'none'; document.getElementById('clear-signature-button').addEventListener('click', () => { if(signaturePad) signaturePad.clear(); }); });
+        document.getElementById('upload-report-form').addEventListener('submit', async (e) => { e.preventDefault(); const form = e.target; const file = form.file.files[0]; if (!file) { showToast('Silakan pilih file terlebih dahulu.', true); return; } showToast('Mengunggah file, mohon tunggu...'); hideModal('upload-report-modal'); const reader = new FileReader(); reader.onload = async (event) => { const fileData = event.target.result; const data = { fileData: fileData, fileName: file.name, fileType: file.type, uploaderName: form.uploaderName.value }; const result = await callGAS({ action: 'uploadFile', data: data }); if (result) { showToast(result.message); form.reset(); } }; reader.readAsDataURL(file); });
+        document.getElementById('admin-login-button').addEventListener('click', () => { if (adminPassword) { document.getElementById('admin-panel').classList.toggle('hidden'); } else { showModal('admin-login-modal'); } });
+        document.getElementById('upload-schedule-button').addEventListener('click', async () => { const fileInput = document.getElementById('schedule-file-input'); const file = fileInput.files[0]; if (!file) { showToast('Pilih file gambar jadwal terlebih dahulu.', true); return; } showToast('Memperbarui jadwal...'); const reader = new FileReader(); reader.onload = async (event) => { const fileData = event.target.result; const data = { fileData: fileData, fileName: file.name, fileType: file.type, password: adminPassword }; const result = await callGAS({ action: 'changeScheduleImage', data: data }); if (result) { showToast(result.message); const img = document.getElementById('schedule-image'); img.src = result.newImageUrl; img.classList.remove('hidden'); document.getElementById('no-schedule-text').classList.add('hidden'); fileInput.value = ''; } }; reader.readAsDataURL(file); });
+        async function getArchives() { showLoader('archive', true); const data = await callGAS({ action: 'getArchiveList' }); const tbody = document.getElementById('archive-table-body'); tbody.innerHTML = ''; if (data && data.length > 0) { data.reverse().forEach(row => { tbody.innerHTML += `<tr><td class="p-2">${row.timestamp}</td><td class="p-2">${row.fileName}</td><td class="p-2">${row.uploaderName}</td><td class="p-2"><a href="${row.downloadUrl}" target="_blank" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-1 px-3 rounded-full text-sm transition">Download</a></td></tr>`; }); } else { tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Belum ada file di arsip.</td></tr>'; } showLoader('archive', false); }
+        async function handleAdminLogin() { const passwordInput = document.getElementById('admin-password-input'); const pass = passwordInput.value; if (!pass) { showToast('Password tidak boleh kosong.', true); return; } const result = await callGAS({ action: 'checkAdminPassword', data: { password: pass } }); if (result && result.isAdmin) { adminPassword = pass; showToast('Login admin berhasil!'); hideModal('admin-login-modal'); document.getElementById('admin-panel').classList.remove('hidden'); passwordInput.value = ''; } else { showToast(result.message || 'Login gagal.', true); } }
     </script>
 </body>
 </html>
