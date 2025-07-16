@@ -1,272 +1,444 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aplikasi Morning Report</title>
-  
-  <!-- Impor Font dan CSS dari CDN -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Impor Pustaka Tanda Tangan -->
-  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-  
-  <style>
-    /* Gaya dasar untuk aplikasi */
-    body { font-family: 'Inter', sans-serif; }
-    .page { display: none; }
-    .page.active { display: block; animation: fadeIn 0.3s; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    
-    /* Gaya untuk loader/spinner */
-    #loader {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(255, 255, 255, 0.85);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 9999; flex-direction: column;
-      backdrop-filter: blur(4px);
-    }
-    .spinner {
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      width: 36px; height: 36px;
-      border-radius: 50%; border-left-color: #3b82f6; /* Warna biru */
-      animation: spin 1s ease infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    
-    /* Gaya untuk area tanda tangan */
-    #signature-pad { cursor: crosshair; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morning Report - RSUD dr. R. Koesma</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icon Library: Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* Custom Styles for Glassmorphism and 3D effects */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+            background-attachment: fixed;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        .glass-button {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+        .table-glass thead {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .table-glass tbody tr {
+            background: rgba(255, 255, 255, 0.15);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-left-color: #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="text-gray-800">
 
-  <!-- Elemen Loader -->
-  <div id="loader" style="display: none;">
-    <div class="spinner"></div>
-    <p class="mt-3 text-gray-600">Memproses...</p>
-  </div>
+    <div id="app-loader" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-sky-500">
+        <div class="loader"></div>
+        <p class="mt-4 text-white font-semibold">Memuat Aplikasi...</p>
+    </div>
 
-  <!-- Kontainer Utama Aplikasi -->
-  <div id="app" class="max-w-4xl mx-auto p-4 md:p-6">
-    <header class="text-center mb-6">
-      <img src="https://jeparahariini.com/wp-content/uploads/2020/03/logo-pemkab-tuban.png" alt="Logo RSUD" class="h-20 mx-auto mb-4" onerror="this.style.display='none'">
-      <h1 class="text-2xl md:text-3xl font-bold text-blue-700">Aplikasi Morning Report</h1>
-      <p class="text-gray-600">RSUD dr. R. Koesma Tuban</p>
-    </header>
+    <div class="container mx-auto p-4 md:p-6 max-w-5xl">
+        <!-- Header -->
+        <header class="text-center mb-6">
+            <!-- Ganti 'URL_LOGO_ANDA' dengan URL logo RSUD -->
+            <img src="https://placehold.co/150x150/ffffff/66a6ff?text=Logo+RSUD" alt="Logo RSUD" class="mx-auto h-24 w-24 rounded-full object-cover mb-4 shadow-lg border-4 border-white">
+            <h1 class="text-3xl md:text-4xl font-bold text-white text-shadow">Aplikasi Morning Report</h1>
+            <p class="text-white/80 mt-1">RSUD dr. R. Koesma Tuban</p>
+        </header>
 
-    <main id="main-content">
-      <!-- Halaman Utama (Menu) -->
-      <div id="page-utama" class="page">
-        <div class="bg-white p-4 rounded-lg shadow-md mb-6">
-          <h2 class="text-xl font-semibold mb-3 text-center">Jadwal & Informasi</h2>
-          <img id="gambar-jadwal" src="https://placehold.co/800x400/e2e8f0/475569?text=Memuat+Jadwal..." alt="Jadwal Kegiatan" class="w-full rounded-md object-cover">
-        </div>
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <button onclick="tampilkanHalaman('page-input-hadir')" class="bg-blue-600 text-white p-4 rounded-lg shadow-md hover:bg-blue-700 transition-colors">Input Daftar Hadir</button>
-          <button onclick="bukaHalamanViewHadir()" class="bg-green-600 text-white p-4 rounded-lg shadow-md hover:bg-green-700 transition-colors">View Kehadiran</button>
-          <a id="link-notulen" href="#" target="_blank" class="bg-purple-600 text-white p-4 rounded-lg shadow-md hover:bg-purple-700 transition-colors text-center flex items-center justify-center col-span-2 md:col-span-1">Buka Notulen</a>
-        </div>
-      </div>
-
-      <!-- Halaman Input Daftar Hadir -->
-      <div id="page-input-hadir" class="page">
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h2 class="text-xl font-semibold mb-4">Formulir Kehadiran</h2>
-          <form id="form-kehadiran">
-            <div class="space-y-4">
-              <div>
-                <label for="nama" class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-                <input type="text" id="nama" name="nama" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-              </div>
-              <div>
-                <label for="hp" class="block text-sm font-medium text-gray-700">Nomor HP (Opsional)</label>
-                <input type="tel" id="hp" name="hp" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-              </div>
-              <div>
-                <label for="unit" class="block text-sm font-medium text-gray-700">Unit / Instalasi</label>
-                <input type="text" id="unit" name="unit" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Tanda Tangan</label>
-                <canvas id="signature-pad" class="w-full aspect-[2/1] bg-white border border-gray-300 rounded-lg"></canvas>
-              </div>
+        <!-- Main Content -->
+        <main>
+            <!-- Jadwal Kegiatan -->
+            <div id="schedule-section" class="glass-card rounded-2xl p-4 md:p-6 mb-6 shadow-xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-white">Jadwal Kegiatan</h2>
+                    <button id="admin-login-button" class="p-2 rounded-full hover:bg-white/20 transition-colors">
+                        <i class="ph-fill ph-user-gear text-2xl text-white"></i>
+                    </button>
+                </div>
+                <div id="schedule-image-container" class="bg-black/20 rounded-lg min-h-[200px] flex items-center justify-center">
+                    <img id="schedule-image" src="" alt="Jadwal Kegiatan" class="rounded-lg w-full h-auto hidden">
+                    <p id="no-schedule-text" class="text-white/70">Jadwal belum tersedia.</p>
+                </div>
+                <div id="admin-panel" class="hidden mt-4">
+                    <p class="text-white font-semibold mb-2">Panel Admin: Ganti Gambar Jadwal</p>
+                    <input type="file" id="schedule-file-input" class="block w-full text-sm text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white/80 file:text-sky-700 hover:file:bg-white">
+                    <button id="upload-schedule-button" class="glass-button w-full mt-2 py-2 px-4 rounded-lg text-white font-semibold">Unggah Jadwal Baru</button>
+                </div>
             </div>
-            <div class="flex items-center justify-between mt-6">
-              <button type="button" onclick="kembaliKeUtama()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Kembali</button>
-              <div>
-                <button type="button" id="clear-signature" class="text-sm text-blue-600 hover:underline mr-4">Hapus TTD</button>
-                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Kirim Kehadiran</button>
-              </div>
+
+            <!-- Menu Utama -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <button onclick="showModal('attendance-modal')" class="glass-button p-4 rounded-2xl flex flex-col items-center justify-center aspect-square">
+                    <i class="ph-fill ph-user-plus text-4xl text-white"></i>
+                    <span class="mt-2 font-semibold text-white text-center text-sm">Input Hadir</span>
+                </button>
+                <button onclick="showModal('view-attendance-modal'); getAttendance();" class="glass-button p-4 rounded-2xl flex flex-col items-center justify-center aspect-square">
+                    <i class="ph-fill ph-users text-4xl text-white"></i>
+                    <span class="mt-2 font-semibold text-white text-center text-sm">View Hadir</span>
+                </button>
+                <button onclick="showModal('upload-report-modal')" class="glass-button p-4 rounded-2xl flex flex-col items-center justify-center aspect-square">
+                    <i class="ph-fill ph-file-arrow-up text-4xl text-white"></i>
+                    <span class="mt-2 font-semibold text-white text-center text-sm">Upload Laporan</span>
+                </button>
+                <button onclick="showModal('archive-modal'); getArchives();" class="glass-button p-4 rounded-2xl flex flex-col items-center justify-center aspect-square">
+                    <i class="ph-fill ph-archive text-4xl text-white"></i>
+                    <span class="mt-2 font-semibold text-white text-center text-sm">Arsip</span>
+                </button>
+                <!-- GANTI # dengan link Google Sheet Notulen Anda -->
+                <a href="#" target="_blank" class="glass-button p-4 rounded-2xl flex flex-col items-center justify-center aspect-square col-span-2 md:col-span-1">
+                    <i class="ph-fill ph-note-pencil text-4xl text-white"></i>
+                    <span class="mt-2 font-semibold text-white text-center text-sm">Notulen</span>
+                </a>
             </div>
-          </form>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Admin Login Modal -->
+    <div id="admin-login-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
+        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-sm shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-4">Login Admin</h3>
+            <input type="password" id="admin-password-input" placeholder="Masukkan password admin" class="w-full p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-white">
+            <div class="flex gap-4 mt-4">
+                <button onclick="handleAdminLogin()" class="glass-button flex-1 py-2 px-4 rounded-lg text-white font-semibold">Login</button>
+                <button onclick="hideModal('admin-login-modal')" class="bg-red-500/50 hover:bg-red-500/80 flex-1 py-2 px-4 rounded-lg text-white font-semibold transition">Batal</button>
+            </div>
         </div>
-      </div>
-
-      <!-- Halaman View Kehadiran -->
-      <div id="page-view-hadir" class="page">
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-semibold">Daftar Kehadiran Hari Ini</h2>
-            <button onclick="kembaliKeUtama()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Kembali</button>
-          </div>
-          <div id="container-daftar-hadir" class="overflow-x-auto"></div>
+    </div>
+    
+    <!-- Modals for features -->
+    <div id="attendance-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
+        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-md shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-4">Input Daftar Hadir</h3>
+            <form id="attendance-form" class="space-y-4">
+                <input type="text" name="name" placeholder="Nama Lengkap" class="w-full p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600" required>
+                <input type="text" name="nip" placeholder="NIP / ID Pegawai" class="w-full p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600" required>
+                <input type="text" name="unit" placeholder="Unit / Bagian" class="w-full p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600" required>
+                <div class="flex gap-4 pt-2">
+                    <button type="submit" class="glass-button flex-1 py-2 px-4 rounded-lg text-white font-semibold">Kirim</button>
+                    <button type="button" onclick="hideModal('attendance-modal')" class="bg-red-500/50 hover:bg-red-500/80 flex-1 py-2 px-4 rounded-lg text-white font-semibold transition">Batal</button>
+                </div>
+            </form>
         </div>
-      </div>
-    </main>
-    
-    <footer class="text-center mt-8 text-sm text-gray-500">
-      <p>&copy; 2024 - Tim IT RSUD dr. R. Koesma Tuban</p>
-    </footer>
-  </div>
+    </div>
 
-<script>
-  // --- KONFIGURASI APLIKASI ---
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbya-XiYph0VQXjgNLfWXQ-qmkk7q4HcU7N6g0x-PCIvrMHhILl9p-_aNUWd-zOUdAWH/exec";
+    <div id="view-attendance-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
+        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-3xl shadow-2xl max-h-[80vh] flex flex-col">
+            <h3 class="text-xl font-bold text-white mb-4">Daftar Kehadiran</h3>
+            <div id="attendance-list-container" class="overflow-auto flex-grow">
+                <!-- Loader -->
+                <div id="attendance-loader" class="flex justify-center items-center h-full">
+                    <div class="loader"></div>
+                </div>
+                <!-- Table -->
+                <table id="attendance-table" class="w-full text-white table-auto table-glass hidden">
+                    <thead class="text-left">
+                        <tr><th class="p-2">Waktu</th><th class="p-2">Nama</th><th class="p-2">NIP</th><th class="p-2">Unit</th></tr>
+                    </thead>
+                    <tbody id="attendance-table-body"></tbody>
+                </table>
+            </div>
+            <button type="button" onclick="hideModal('view-attendance-modal')" class="bg-red-500/50 hover:bg-red-500/80 w-full mt-4 py-2 px-4 rounded-lg text-white font-semibold transition">Tutup</button>
+        </div>
+    </div>
 
-  // --- VARIABEL GLOBAL ---
-  let signaturePad;
-  let canvas;
+    <div id="upload-report-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
+        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-md shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-4">Upload Bahan Laporan</h3>
+            <form id="upload-report-form" class="space-y-4">
+                <input type="text" name="uploaderName" placeholder="Nama Pengunggah" class="w-full p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600" required>
+                <input type="file" name="file" class="block w-full text-sm text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white/80 file:text-sky-700 hover:file:bg-white" required>
+                <div class="flex gap-4 pt-2">
+                    <button type="submit" class="glass-button flex-1 py-2 px-4 rounded-lg text-white font-semibold">Upload</button>
+                    <button type="button" onclick="hideModal('upload-report-modal')" class="bg-red-500/50 hover:bg-red-500/80 flex-1 py-2 px-4 rounded-lg text-white font-semibold transition">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-  // --- FUNGSI UTAMA ---
+    <div id="archive-modal" class="fixed inset-0 z-40 hidden items-center justify-center modal-backdrop">
+        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-4xl shadow-2xl max-h-[80vh] flex flex-col">
+            <h3 class="text-xl font-bold text-white mb-4">Arsip Laporan</h3>
+            <div id="archive-list-container" class="overflow-auto flex-grow">
+                <!-- Loader -->
+                <div id="archive-loader" class="flex justify-center items-center h-full">
+                    <div class="loader"></div>
+                </div>
+                <!-- Table -->
+                <table id="archive-table" class="w-full text-white table-auto table-glass hidden">
+                    <thead class="text-left">
+                        <tr><th class="p-2">Waktu Unggah</th><th class="p-2">Nama File</th><th class="p-2">Pengunggah</th><th class="p-2">Aksi</th></tr>
+                    </thead>
+                    <tbody id="archive-table-body"></tbody>
+                </table>
+            </div>
+            <button type="button" onclick="hideModal('archive-modal')" class="bg-red-500/50 hover:bg-red-500/80 w-full mt-4 py-2 px-4 rounded-lg text-white font-semibold transition">Tutup</button>
+        </div>
+    </div>
 
-  // Inisialisasi semua event listener saat halaman selesai dimuat
-  document.addEventListener('DOMContentLoaded', function() {
-    canvas = document.getElementById('signature-pad');
-    setupSignaturePad();
-    loadInitialData();
-    
-    document.getElementById('form-kehadiran').addEventListener('submit', handleFormKehadiranSubmit);
-    document.getElementById('clear-signature').addEventListener('click', () => signaturePad.clear());
-    window.addEventListener("resize", resizeCanvas);
-  });
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 glass-card p-4 rounded-lg shadow-2xl hidden transform translate-y-20 transition-transform duration-500">
+        <p id="toast-message" class="text-white font-semibold"></p>
+    </div>
 
-  // Fungsi untuk memanggil API di Google Apps Script
-  async function callApi(functionName, data = {}) {
-    showLoader();
-    try {
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        redirect: 'follow', // Penting untuk menangani redirect dari Google
-        body: JSON.stringify({ function: functionName, data: data }),
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Gunakan text/plain untuk menghindari preflight
-      });
-      
-      const response = await res.json();
-      hideLoader();
+    <script>
+        // --- KONFIGURASI FRONTEND ---
+        // URL Web App Anda telah dimasukkan di sini
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbya-XiYph0VQXjgNLfWXQ-qmkk7q4HcU7N6g0x-PCIvrMHhILl9p-_aNUWd-zOUdAWH/exec';
+        
+        let adminPassword = null;
 
-      if (response.status !== 'sukses') {
-        throw new Error(response.message || 'Terjadi kesalahan di server.');
-      }
-      return response;
-    } catch (error) {
-      hideLoader();
-      showAlert(`Terjadi kesalahan: ${error.message}`);
-      throw error;
-    }
-  }
+        // --- HELPER FUNCTIONS ---
+        function showModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById(id).classList.add('flex');
+        }
 
-  // --- MANAJEMEN TAMPILAN (UI) ---
+        function hideModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            document.getElementById(id).classList.remove('flex');
+        }
 
-  const loader = document.getElementById('loader');
-  function tampilkanHalaman(idHalaman) {
-    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-    const halamanTarget = document.getElementById(idHalaman);
-    if (halamanTarget) {
-      halamanTarget.classList.add('active');
-      if (idHalaman === 'page-input-hadir') {
-        setTimeout(() => resizeCanvas(), 10);
-      }
-    }
-  }
-  function kembaliKeUtama() { tampilkanHalaman('page-utama'); }
-  function showLoader() { loader.style.display = 'flex'; }
-  function hideLoader() { loader.style.display = 'none'; }
-  function showAlert(message) { alert(message); }
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            toastMessage.textContent = message;
+            
+            toast.classList.remove('hidden', 'bg-red-500/50', 'translate-y-20');
+            toast.classList.add(isError ? 'bg-red-500/50' : 'glass-card');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20');
+                setTimeout(() => toast.classList.add('hidden'), 500);
+            }, 3000);
+        }
 
-  // --- MANAJEMEN DATA ---
+        function showLoader(containerId, show = true) {
+            const loader = document.getElementById(containerId + '-loader');
+            const table = document.getElementById(containerId + '-table');
+            if (loader) loader.style.display = show ? 'flex' : 'none';
+            if (table) table.style.display = show ? 'none' : 'table';
+        }
 
-  // Memuat data awal (gambar jadwal & link notulen)
-  async function loadInitialData() {
-    try {
-      const response = await callApi('getInitialConfig');
-      document.getElementById('gambar-jadwal').src = response.data.urlGambarJadwal;
-      document.getElementById('link-notulen').href = response.data.urlNotulen;
-      tampilkanHalaman('page-utama');
-    } catch (error) {
-      // Error sudah ditangani di callApi
-    }
-  }
+        // --- API CALLS ---
+        async function callGAS(payload) {
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    redirect: 'follow',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-t' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (result.status === 'error') {
+                    throw new Error(result.message);
+                }
+                return result.data;
+            } catch (error) {
+                console.error('Error calling GAS:', error);
+                showToast('Terjadi kesalahan: ' + error.message, true);
+                return null;
+            }
+        }
 
-  // Menangani pengiriman form kehadiran
-  async function handleFormKehadiranSubmit(event) {
-    event.preventDefault();
-    if (signaturePad.isEmpty()) {
-      showAlert("Tanda tangan tidak boleh kosong.");
-      return;
-    }
-    const formData = {
-      nama: document.getElementById('nama').value,
-      hp: document.getElementById('hp').value,
-      unit: document.getElementById('unit').value,
-      tandaTangan: signaturePad.toDataURL('image/png')
-    };
-    
-    try {
-      const response = await callApi('simpanKehadiran', formData);
-      showAlert(response.message);
-      document.getElementById('form-kehadiran').reset();
-      signaturePad.clear();
-      kembaliKeUtama();
-    } catch (error) {
-      // Error sudah ditangani di callApi
-    }
-  }
+        // --- PAGE INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            const appLoader = document.getElementById('app-loader');
+            const data = await callGAS({ action: 'getInitialData' });
+            if (data && data.scheduleImageUrl) {
+                const img = document.getElementById('schedule-image');
+                img.src = data.scheduleImageUrl;
+                img.classList.remove('hidden');
+                document.getElementById('no-schedule-text').classList.add('hidden');
+            }
+            appLoader.style.display = 'none';
+        });
 
-  // Membuka dan memuat data di halaman "View Kehadiran"
-  async function bukaHalamanViewHadir() {
-    tampilkanHalaman('page-view-hadir');
-    const container = document.getElementById('container-daftar-hadir');
-    container.innerHTML = '<p class="text-center text-gray-500">Memuat data kehadiran...</p>';
-    
-    try {
-      const response = await callApi('getDaftarKehadiranHariIni');
-      renderTabelKehadiran(response.data);
-    } catch (error) {
-      container.innerHTML = `<p class="text-center text-red-500">Gagal memuat data.</p>`;
-    }
-  }
+        // --- EVENT LISTENERS ---
+        document.getElementById('attendance-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                name: form.name.value,
+                nip: form.nip.value,
+                unit: form.unit.value
+            };
+            const result = await callGAS({ action: 'recordAttendance', data: data });
+            if (result) {
+                showToast(result.message);
+                form.reset();
+                hideModal('attendance-modal');
+            }
+        });
 
-  // Menampilkan data kehadiran ke dalam tabel
-  function renderTabelKehadiran(data) {
-    const container = document.getElementById('container-daftar-hadir');
-    if (!data || data.length === 0) {
-      container.innerHTML = '<p class="text-center text-gray-500">Belum ada data kehadiran untuk hari ini.</p>';
-      return;
-    }
-    let tableHTML = `<table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jam</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit/Instalasi</th><th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanda Tangan</th></tr></thead><tbody class="bg-white divide-y divide-gray-200">`;
-    data.forEach(item => {
-      const ttdImage = item.ttd ? `<img src="${item.ttd}" alt="Tanda Tangan" class="h-12 w-auto bg-gray-200 rounded"/>` : '<span>-</span>';
-      tableHTML += `<tr><td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${item.jam}</td><td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${item.nama}</td><td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${item.unit}</td><td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">${ttdImage}</td></tr>`;
-    });
-    tableHTML += '</tbody></table>';
-    container.innerHTML = tableHTML;
-  }
-  
-  // --- FUNGSI UNTUK TANDA TANGAN ---
-  
-  function resizeCanvas() {
-    if (!canvas) return;
-    const ratio =  Math.max(window.devicePixelRatio || 1, 1);
-    canvas.width = canvas.offsetWidth * ratio;
-    canvas.height = canvas.offsetHeight * ratio;
-    canvas.getContext("2d").scale(ratio, ratio);
-    if (signaturePad) signaturePad.clear(); 
-  }
+        document.getElementById('upload-report-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const file = form.file.files[0];
+            if (!file) {
+                showToast('Silakan pilih file terlebih dahulu.', true);
+                return;
+            }
+            
+            showToast('Mengunggah file, mohon tunggu...');
+            hideModal('upload-report-modal');
 
-  function setupSignaturePad() {
-    signaturePad = new SignaturePad(canvas, { backgroundColor: 'rgb(255, 255, 255)' });
-  }
-</script>
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const fileData = event.target.result;
+                const data = {
+                    fileData: fileData,
+                    fileName: file.name,
+                    fileType: file.type,
+                    uploaderName: form.uploaderName.value
+                };
+                const result = await callGAS({ action: 'uploadFile', data: data });
+                if (result) {
+                    showToast(result.message);
+                    form.reset();
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        document.getElementById('admin-login-button').addEventListener('click', () => {
+            if (adminPassword) {
+                // Jika sudah login, toggle panel
+                document.getElementById('admin-panel').classList.toggle('hidden');
+            } else {
+                showModal('admin-login-modal');
+            }
+        });
+        
+        document.getElementById('upload-schedule-button').addEventListener('click', async () => {
+             const fileInput = document.getElementById('schedule-file-input');
+             const file = fileInput.files[0];
+             if (!file) {
+                 showToast('Pilih file gambar jadwal terlebih dahulu.', true);
+                 return;
+             }
+             
+             showToast('Memperbarui jadwal...');
+
+             const reader = new FileReader();
+             reader.onload = async (event) => {
+                 const fileData = event.target.result;
+                 const data = {
+                     fileData: fileData,
+                     fileName: file.name,
+                     fileType: file.type,
+                     password: adminPassword
+                 };
+                 const result = await callGAS({ action: 'changeScheduleImage', data: data });
+                 if (result) {
+                     showToast(result.message);
+                     const img = document.getElementById('schedule-image');
+                     img.src = result.newImageUrl + '&t=' + new Date().getTime(); // Cache busting
+                     img.classList.remove('hidden');
+                     document.getElementById('no-schedule-text').classList.add('hidden');
+                     fileInput.value = '';
+                 }
+             };
+             reader.readAsDataURL(file);
+        });
+
+        // --- DATA FETCHING FUNCTIONS ---
+        async function getAttendance() {
+            showLoader('attendance', true);
+            const data = await callGAS({ action: 'getAttendanceList' });
+            const tbody = document.getElementById('attendance-table-body');
+            tbody.innerHTML = '';
+            if (data && data.length > 0) {
+                data.reverse().forEach(row => { // Show latest first
+                    tbody.innerHTML += `<tr>
+                        <td class="p-2">${row.timestamp}</td>
+                        <td class="p-2">${row.name}</td>
+                        <td class="p-2">${row.nip}</td>
+                        <td class="p-2">${row.unit}</td>
+                    </tr>`;
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Belum ada data kehadiran.</td></tr>';
+            }
+            showLoader('attendance', false);
+        }
+
+        async function getArchives() {
+            showLoader('archive', true);
+            const data = await callGAS({ action: 'getArchiveList' });
+            const tbody = document.getElementById('archive-table-body');
+            tbody.innerHTML = '';
+            if (data && data.length > 0) {
+                data.reverse().forEach(row => { // Show latest first
+                    tbody.innerHTML += `<tr>
+                        <td class="p-2">${row.timestamp}</td>
+                        <td class="p-2">${row.fileName}</td>
+                        <td class="p-2">${row.uploaderName}</td>
+                        <td class="p-2">
+                            <a href="${row.downloadUrl}" target="_blank" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-1 px-3 rounded-full text-sm transition">Download</a>
+                        </td>
+                    </tr>`;
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Belum ada file di arsip.</td></tr>';
+            }
+            showLoader('archive', false);
+        }
+        
+        async function handleAdminLogin() {
+            const passwordInput = document.getElementById('admin-password-input');
+            const pass = passwordInput.value;
+            if (!pass) {
+                showToast('Password tidak boleh kosong.', true);
+                return;
+            }
+            
+            const result = await callGAS({ action: 'checkAdminPassword', data: { password: pass } });
+            if (result && result.isAdmin) {
+                adminPassword = pass;
+                showToast('Login admin berhasil!');
+                hideModal('admin-login-modal');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                passwordInput.value = '';
+            } else {
+                showToast(result.message || 'Login gagal.', true);
+            }
+        }
+    </script>
 </body>
 </html>
