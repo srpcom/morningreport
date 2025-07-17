@@ -32,6 +32,17 @@
         #sticky-header.show {
             transform: translateY(0);
         }
+        /* Menyembunyikan input tanggal secara visual tapi tetap fungsional */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
     </style>
 </head>
 <body class="text-gray-800">
@@ -133,12 +144,10 @@
             <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
                 <h3 id="attendance-title" class="text-xl font-bold text-white mb-2 sm:mb-0">Daftar Kehadiran</h3>
                 <div class="flex items-center gap-2">
-                    <div class="relative">
-                        <label for="attendance-date-picker" class="glass-button flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer">
-                            <i class="ph-fill ph-calendar text-xl text-white"></i>
-                        </label>
-                        <input type="date" id="attendance-date-picker" class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer">
-                    </div>
+                    <label for="attendance-date-picker" class="glass-button flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer">
+                        <i class="ph-fill ph-calendar text-xl text-white"></i>
+                    </label>
+                    <input type="date" id="attendance-date-picker" class="visually-hidden">
                     <button id="refresh-attendance-btn" class="glass-button flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer">
                         <i class="ph-fill ph-arrow-clockwise text-xl text-white"></i>
                     </button>
@@ -332,7 +341,6 @@
             }
         }
         
-        // [DIUBAH] Logika pemfilteran tanggal diperbaiki
         function filterAndRenderAttendance() {
             const datePicker = document.getElementById('attendance-date-picker');
             const titleEl = document.getElementById('attendance-title');
@@ -340,9 +348,8 @@
             
             const selectedDate = datePicker.valueAsDate;
             if (!selectedDate) return;
-
-            // Menggunakan toLocaleDateString untuk perbandingan yang andal di zona waktu lokal
-            const selectedDateString = selectedDate.toLocaleDateString('en-CA'); // Format YYYY-MM-DD
+            
+            const selectedDateString = selectedDate.toLocaleDateString('en-CA');
 
             filteredAttendanceData = fullAttendanceData.filter(item => {
                 const itemDate = new Date(item.timestamp);
@@ -603,6 +610,7 @@
             
             document.getElementById('attendance-date-picker')?.addEventListener('change', filterAndRenderAttendance);
             document.getElementById('refresh-attendance-btn')?.addEventListener('click', getAttendance);
+            
         });
 
         window.addEventListener('scroll', () => {
