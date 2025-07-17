@@ -264,13 +264,19 @@
             }
         }
 
-        function showToast(message, isError = false) {
+        function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toast-message');
             if (!toast || !toastMessage) return;
             toastMessage.textContent = message;
-            toast.classList.remove('hidden', 'bg-red-500/50', 'translate-y-20');
-            toast.classList.add(isError ? 'bg-red-500/50' : 'glass-card');
+            toast.classList.remove('bg-green-500/50', 'bg-red-500/50', 'bg-yellow-400/50');
+            switch (type) {
+                case 'success': toast.classList.add('bg-green-500/50'); break;
+                case 'error': toast.classList.add('bg-red-500/50'); break;
+                case 'loading': toast.classList.add('bg-yellow-400/50'); break;
+                default: toast.classList.add('glass-card');
+            }
+            toast.classList.remove('hidden', 'translate-y-20');
             setTimeout(() => {
                 toast.classList.add('translate-y-20');
                 setTimeout(() => toast.classList.add('hidden'), 500);
@@ -300,13 +306,13 @@
                 return result.data;
             } catch (error) {
                 console.error('Error calling GAS:', error);
-                showToast('Terjadi kesalahan: ' + error.message, true);
+                showToast('Terjadi kesalahan: ' + error.message, 'error');
                 return null;
             }
         }
 
         async function populateAttendeeDropdown() {
-            showToast('Memuat daftar nama...');
+            showToast('Memuat daftar nama...', 'loading');
             const data = await callGAS({ action: 'getAttendanceList' });
             if (data) {
                 allAttendeesData = data.reverse(); 
@@ -320,9 +326,9 @@
                     option.value = name;
                     datalist.appendChild(option);
                 });
-                showToast('Daftar nama berhasil dimuat.', false);
+                showToast('Daftar nama berhasil dimuat.', 'success');
             } else {
-                showToast('Gagal memuat daftar nama.', true);
+                showToast('Gagal memuat daftar nama.', 'error');
             }
         }
         
@@ -414,7 +420,8 @@
             tbody.innerHTML = '';
             if (data && data.length > 0) {
                 data.reverse().forEach(row => {
-                    tbody.innerHTML += `<tr><td class="p-2">${row.timestamp}</td><td class="p-2">${row.fileName}</td><td class="p-2">${row.uploaderName}</td><td class="p-2"><a href="${row.downloadUrl}" target="_blank" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-1 px-3 rounded-full text-sm transition">Download</a></td></tr>`;
+                    const formattedTimestamp = new Date(row.timestamp).toLocaleString('id-ID');
+                    tbody.innerHTML += `<tr><td class="p-2">${formattedTimestamp}</td><td class="p-2">${row.fileName}</td><td class="p-2">${row.uploaderName}</td><td class="p-2"><a href="${row.downloadUrl}" target="_blank" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-1 px-3 rounded-full text-sm transition">Download</a></td></tr>`;
                 });
             } else {
                 tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Belum ada file di arsip.</td></tr>';
@@ -427,18 +434,18 @@
             if (!passwordInput) return;
             const pass = passwordInput.value;
             if (!pass) {
-                showToast('Password tidak boleh kosong.', true);
+                showToast('Password tidak boleh kosong.', 'error');
                 return;
             }
             const result = await callGAS({ action: 'checkAdminPassword', data: { password: pass } });
             if (result && result.isAdmin) {
                 adminPassword = pass;
-                showToast('Login admin berhasil!');
+                showToast('Login admin berhasil!', 'success');
                 hideModal('admin-login-modal');
                 document.getElementById('admin-panel')?.classList.remove('hidden');
                 passwordInput.value = '';
             } else {
-                showToast(result.message || 'Login gagal.', true);
+                showToast(result.message || 'Login gagal.', 'error');
             }
         }
 
@@ -479,17 +486,17 @@
             document.getElementById('attendance-form')?.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 if (signaturePad && signaturePad.isEmpty()) {
-                    showToast("Mohon bubuhkan tanda tangan Anda.", true);
+                    showToast("Mohon bubuhkan tanda tangan Anda.", 'error');
                     return;
                 }
                 const form = e.target;
                 const signatureData = signaturePad.toDataURL('image/png');
                 const data = { name: form.name.value, unit: form.unit.value, signature: signatureData };
-                showToast('Mengirim data kehadiran...');
+                showToast('Mengirim data kehadiran...', 'loading');
                 hideModal('attendance-modal');
                 const result = await callGAS({ action: 'recordAttendance', data: data });
                 if (result) {
-                    showToast(result.message);
+                    showToast(result.message, 'success');
                     form.reset();
                     if (signaturePad) signaturePad.clear();
                 }
@@ -500,10 +507,10 @@
                 const form = e.target;
                 const file = form.file.files[0];
                 if (!file) {
-                    showToast('Silakan pilih file terlebih dahulu.', true);
+                    showToast('Silakan pilih file terlebih dahulu.', 'error');
                     return;
                 }
-                showToast('Mengunggah file, mohon tunggu...');
+                showToast('Mengunggah file, mohon tunggu...', 'loading');
                 hideModal('upload-report-modal');
                 const reader = new FileReader();
                 reader.onload = async (event) => {
@@ -511,7 +518,7 @@
                     const data = { fileData: fileData, fileName: file.name, fileType: file.type, uploaderName: form.uploaderName.value };
                     const result = await callGAS({ action: 'uploadFile', data: data });
                     if (result) {
-                        showToast(result.message);
+                        showToast(result.message, 'success');
                         form.reset();
                     }
                 };
@@ -533,17 +540,17 @@
                 if (!fileInput) return;
                 const file = fileInput.files[0];
                 if (!file) {
-                    showToast('Pilih file gambar jadwal terlebih dahulu.', true);
+                    showToast('Pilih file gambar jadwal terlebih dahulu.', 'error');
                     return;
                 }
-                showToast('Memperbarui jadwal...');
+                showToast('Memperbarui jadwal...', 'loading');
                 const reader = new FileReader();
                 reader.onload = async (event) => {
                     const fileData = event.target.result;
                     const data = { fileData: fileData, fileName: file.name, fileType: file.type, password: adminPassword };
                     const result = await callGAS({ action: 'changeScheduleImage', data: data });
                     if (result) {
-                        showToast(result.message);
+                        showToast(result.message, 'success');
                         const img = document.getElementById('schedule-image');
                         if (img) {
                             img.src = result.newImageUrl;
