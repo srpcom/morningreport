@@ -32,6 +32,19 @@
         #sticky-header.show {
             transform: translateY(0);
         }
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+        #summary-content {
+            white-space: pre-wrap;
+        }
     </style>
 </head>
 <body class="text-gray-800">
@@ -129,23 +142,20 @@
         </div>
     </div>
     <div id="view-attendance-modal" class="fixed inset-0 z-50 hidden items-start sm:items-center justify-center modal-backdrop pt-8 sm:pt-0">
-        <div class="glass-card rounded-2xl p-4 sm:p-6 w-11/12 max-w-4xl max-h-[90vh] flex flex-col">
-            <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
-                <h3 id="attendance-title" class="text-xl font-bold text-white mb-2 sm:mb-0">Daftar Kehadiran</h3>
-                <div class="flex items-center gap-2">
-                    <!-- [DIUBAH] Struktur Tombol Kalender diperbaiki -->
-                    <div class="relative">
-                        <label for="attendance-date-picker" class="glass-button flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer">
-                            <i class="ph-fill ph-calendar text-xl text-white"></i>
-                        </label>
-                        <input type="date" id="attendance-date-picker" class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer">
-                    </div>
+        <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-4 sm:p-6 w-11/12 max-w-4xl max-h-[90vh] flex flex-col">
+            <div class="flex flex-col items-center mb-4">
+                <h3 id="attendance-title" class="text-xl font-bold text-white text-center">Daftar Kehadiran</h3>
+                <div class="flex items-center gap-2 mt-2">
+                    <label for="attendance-date-picker" class="glass-button flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer">
+                        <i class="ph-fill ph-calendar text-xl text-white"></i>
+                    </label>
+                    <input type="date" id="attendance-date-picker" class="visually-hidden">
                     <button id="refresh-attendance-btn" class="glass-button flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer">
                         <i class="ph-fill ph-arrow-clockwise text-xl text-white"></i>
                     </button>
                 </div>
             </div>
-            <div id="attendance-list-container" class="overflow-auto flex-grow">
+            <div id="attendance-list-container" class="overflow-auto flex-grow h-[24rem] sm:h-auto">
                 <div id="attendance-loader" class="flex justify-center items-center h-full"><div class="loader"></div></div>
                 <table id="attendance-table" class="w-full text-white table-auto table-glass hidden">
                     <thead class="text-left">
@@ -197,12 +207,21 @@
                 <div id="archive-loader" class="flex justify-center items-center h-full"><div class="loader"></div></div>
                 <table id="archive-table" class="w-full text-white table-auto table-glass hidden">
                     <thead class="text-left">
-                        <tr><th class="p-2">Waktu Unggah</th><th class="p-2">Nama File</th><th class="p-2">Pengunggah</th><th class="p-2">Aksi</th></tr>
+                        <tr><th class="p-2">Waktu Unggah</th><th class="p-2">Nama File</th><th class="p-2">Pengunggah</th><th class="p-2 text-center">Aksi</th></tr>
                     </thead>
                     <tbody id="archive-table-body"></tbody>
                 </table>
             </div>
             <button type="button" onclick="hideModal('archive-modal')" class="bg-red-500/50 hover:bg-red-500/80 w-full mt-4 py-2 px-4 rounded-lg text-white font-semibold transition">Tutup</button>
+        </div>
+    </div>
+    <div id="summary-modal" class="fixed inset-0 z-[60] hidden items-center justify-center modal-backdrop">
+        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-2xl shadow-2xl max-h-[80vh] flex flex-col">
+            <h3 class="text-xl font-bold text-white mb-4">Ringkasan AI</h3>
+            <div class="overflow-y-auto bg-black/20 p-4 rounded-lg flex-grow">
+                <p id="summary-content" class="text-white"></p>
+            </div>
+            <button type="button" onclick="hideModal('summary-modal')" class="bg-red-500/50 hover:bg-red-500/80 w-full mt-4 py-2 px-4 rounded-lg text-white font-semibold transition">Tutup</button>
         </div>
     </div>
     <div id="fullscreen-image-modal" class="fixed inset-0 z-[60] hidden items-center justify-center modal-backdrop" onclick="hideModal('fullscreen-image-modal')">
@@ -418,12 +437,21 @@
             if (data && data.length > 0) {
                 data.reverse().forEach(row => {
                     const formattedTimestamp = new Date(row.timestamp).toLocaleString('id-ID');
-                    tbody.innerHTML += `<tr><td class="p-2">${formattedTimestamp}</td><td class="p-2">${row.fileName}</td><td class="p-2">${row.uploaderName}</td><td class="p-2"><a href="${row.downloadUrl}" target="_blank" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-1 px-3 rounded-full text-sm transition">Download</a></td></tr>`;
+                    tbody.innerHTML += `<tr><td class="p-2">${formattedTimestamp}</td><td class="p-2">${row.fileName}</td><td class="p-2">${row.uploaderName}</td><td class="p-2 text-center space-x-2"><a href="${row.downloadUrl}" target="_blank" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-1 px-3 rounded-full text-sm transition inline-block">Download</a><button onclick="showSummary(this)" data-summary="${escape(row.summary)}" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-1 px-3 rounded-full text-sm transition inline-block">Ringkasan</button></td></tr>`;
                 });
             } else {
                 tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Belum ada file di arsip.</td></tr>';
             }
             showLoader('archive', false);
+        }
+        
+        function showSummary(button) {
+            const summaryText = unescape(button.getAttribute('data-summary'));
+            const summaryContent = document.getElementById('summary-content');
+            if (summaryContent) {
+                summaryContent.textContent = summaryText;
+                showModal('summary-modal');
+            }
         }
 
         async function handleAdminLogin() {
