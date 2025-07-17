@@ -20,6 +20,7 @@
         .modal-backdrop { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); }
         .table-glass thead { background: rgba(255, 255, 255, 0.3); }
         .table-glass tbody tr { background: rgba(255, 255, 255, 0.15); border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+        .table-glass td, .table-glass th { padding: 0.3rem 0.5rem; } /* Jarak baris lebih kecil */
         .loader { border: 4px solid rgba(255, 255, 255, 0.3); border-left-color: #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         #signature-canvas { border: 1px solid #e2e8f0; border-radius: 0.5rem; cursor: crosshair; background-color: #ffffff; width: 100%; height: 100%; }
@@ -129,13 +130,20 @@
     </div>
     <div id="view-attendance-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
         <div class="glass-card rounded-2xl p-6 w-11/12 max-w-4xl shadow-2xl max-h-[80vh] flex flex-col">
-            <h3 class="text-xl font-bold text-white mb-4">Daftar Kehadiran</h3>
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
+                <h3 id="attendance-title" class="text-xl font-bold text-white mb-2 sm:mb-0">Daftar Kehadiran</h3>
+                <input type="date" id="attendance-date-picker" class="p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600">
+            </div>
             <div id="attendance-list-container" class="overflow-auto flex-grow">
                 <div id="attendance-loader" class="flex justify-center items-center h-full"><div class="loader"></div></div>
                 <table id="attendance-table" class="w-full text-white table-auto table-glass hidden">
                     <thead class="text-left">
                         <tr>
-                            <th class="p-2">Waktu</th><th class="p-2">Nama</th><th class="p-2">Unit</th><th class="p-2">Tanda Tangan</th>
+                            <th class="w-12">No.</th>
+                            <th>Waktu</th>
+                            <th>Nama</th>
+                            <th>Unit</th>
+                            <th>Tanda Tangan</th>
                         </tr>
                     </thead>
                     <tbody id="attendance-table-body"></tbody>
@@ -210,6 +218,7 @@
         let currentPage = 1;
         const rowsPerPage = 20;
         let fullAttendanceData = [];
+        let filteredAttendanceData = [];
         let allAttendeesData = [];
         let isAttendeeListFetched = false;
 
@@ -306,6 +315,25 @@
                 showToast('Gagal memuat daftar nama.', true);
             }
         }
+        
+        function filterAndRenderAttendance() {
+            const datePicker = document.getElementById('attendance-date-picker');
+            const selectedDate = new Date(datePicker.value);
+            const selectedDateString = new Date(selectedDate.getTime() - (selectedDate.getTimezoneOffset() * -60000 )).toISOString().split('T')[0];
+
+            filteredAttendanceData = fullAttendanceData.filter(item => {
+                const itemDate = new Date(item.timestamp);
+                const itemDateString = new Date(itemDate.getTime() - (itemDate.getTimezoneOffset() * -60000 )).toISOString().split('T')[0];
+                return itemDateString === selectedDateString;
+            });
+
+            const titleEl = document.getElementById('attendance-title');
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            titleEl.textContent = `Daftar Kehadiran ${selectedDate.toLocaleDateString('id-ID', options)}`;
+
+            currentPage = 1;
+            renderAttendancePage();
+        }
 
         function renderAttendancePage() {
             const tbody = document.getElementById('attendance-table-body');
@@ -315,21 +343,29 @@
             const paginationControls = document.getElementById('pagination-controls');
             if (!tbody || !pageInfo || !prevBtn || !nextBtn || !paginationControls) return;
             tbody.innerHTML = '';
-            if (fullAttendanceData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Belum ada data kehadiran.</td></tr>';
+
+            if (filteredAttendanceData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">Tidak ada data kehadiran pada tanggal ini.</td></tr>';
                 paginationControls.classList.add('hidden');
                 return;
             }
+
             paginationControls.classList.remove('hidden');
-            const totalPages = Math.ceil(fullAttendanceData.length / rowsPerPage);
+
+            const totalPages = Math.ceil(filteredAttendanceData.length / rowsPerPage);
             pageInfo.textContent = `Halaman ${currentPage} dari ${totalPages}`;
+
             const start = (currentPage - 1) * rowsPerPage;
             const end = start + rowsPerPage;
-            const paginatedItems = fullAttendanceData.slice(start, end);
-            paginatedItems.forEach(row => {
+            const paginatedItems = filteredAttendanceData.slice(start, end);
+
+            paginatedItems.forEach((row, index) => {
+                const rowNumber = start + index + 1;
+                const timeOnly = new Date(row.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }).replace(/\./g, ':');
                 const signatureCell = row.signatureUrl ? `<a href="${row.signatureUrl}" target="_blank" class="text-sky-300 hover:text-sky-100">Lihat</a>` : 'Tidak ada';
-                tbody.innerHTML += `<tr><td class="p-2">${row.timestamp}</td><td class="p-2">${row.name}</td><td class="p-2">${row.unit}</td><td class="p-2">${signatureCell}</td></tr>`;
+                tbody.innerHTML += `<tr><td>${rowNumber}</td><td>${timeOnly}</td><td>${row.name}</td><td>${row.unit}</td><td>${signatureCell}</td></tr>`;
             });
+
             prevBtn.disabled = currentPage === 1;
             nextBtn.disabled = currentPage === totalPages;
         }
@@ -337,14 +373,18 @@
         async function getAttendance() {
             showLoader('attendance', true);
             document.getElementById('pagination-controls')?.classList.add('hidden');
+            
+            const datePicker = document.getElementById('attendance-date-picker');
+            if(datePicker) datePicker.valueAsDate = new Date();
+
             const data = await callGAS({ action: 'getAttendanceList' });
+            
             if (data) {
                 fullAttendanceData = data.reverse();
-                currentPage = 1;
-                renderAttendancePage();
+                filterAndRenderAttendance();
             } else {
                 const tbody = document.getElementById('attendance-table-body');
-                if(tbody) tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Gagal memuat data.</td></tr>';
+                if(tbody) tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">Gagal memuat data.</td></tr>';
             }
             showLoader('attendance', false);
         }
@@ -507,7 +547,7 @@
             });
 
             document.getElementById('next-page-btn')?.addEventListener('click', () => {
-                const totalPages = Math.ceil(fullAttendanceData.length / rowsPerPage);
+                const totalPages = Math.ceil(filteredAttendanceData.length / rowsPerPage);
                 if (currentPage < totalPages) {
                     currentPage++;
                     renderAttendancePage();
@@ -536,6 +576,8 @@
                     }
                 });
             }
+            
+            document.getElementById('attendance-date-picker')?.addEventListener('change', filterAndRenderAttendance);
         });
 
         window.addEventListener('scroll', () => {
