@@ -326,20 +326,23 @@
             }
         }
         
+        // [DIUBAH] Logika pemfilteran tanggal diperbaiki
         function filterAndRenderAttendance() {
             const datePicker = document.getElementById('attendance-date-picker');
             const titleEl = document.getElementById('attendance-title');
             if (!datePicker || !titleEl) return;
             
-            const selectedDateString = datePicker.value; // Format YYYY-MM-DD
-            
+            const selectedDate = datePicker.valueAsDate;
+            if (!selectedDate) return;
+
+            // Menggunakan toLocaleDateString untuk perbandingan yang andal di zona waktu lokal
+            const selectedDateString = selectedDate.toLocaleDateString('en-CA'); // Format YYYY-MM-DD
+
             filteredAttendanceData = fullAttendanceData.filter(item => {
                 const itemDate = new Date(item.timestamp);
-                const itemDateString = itemDate.toISOString().split('T')[0];
-                return itemDateString === selectedDateString;
+                return itemDate.toLocaleDateString('en-CA') === selectedDateString;
             });
-            
-            const selectedDate = new Date(selectedDateString + 'T00:00:00');
+
             const options = { day: 'numeric', month: 'long', year: 'numeric' };
             titleEl.textContent = `Daftar Kehadiran ${selectedDate.toLocaleDateString('id-ID', options)}`;
 
@@ -387,9 +390,8 @@
             document.getElementById('pagination-controls')?.classList.add('hidden');
             
             const datePicker = document.getElementById('attendance-date-picker');
-            if(datePicker) {
-                const today = new Date();
-                datePicker.value = today.toISOString().split('T')[0];
+            if(datePicker && !datePicker.value) {
+                datePicker.valueAsDate = new Date();
             }
 
             const data = await callGAS({ action: 'getAttendanceList' });
