@@ -58,9 +58,8 @@
 
         <!-- Main Content -->
         <main>
-            <!-- [DIUBAH] Jadwal Kegiatan -->
+            <!-- Jadwal Kegiatan -->
             <div id="schedule-section" class="glass-card rounded-2xl mb-6 shadow-xl overflow-hidden">
-                <!-- Judul dan tombol admin lama dihapus dari sini -->
                 <div id="schedule-image-container" class="bg-black/20 min-h-[250px] flex items-center justify-center md:rounded-lg">
                     <img id="schedule-image" src="" alt="Jadwal Kegiatan" class="w-full h-auto object-contain hidden md:rounded-lg cursor-pointer">
                     <p id="no-schedule-text" class="text-white/70">Jadwal belum tersedia.</p>
@@ -104,19 +103,100 @@
     </div>
 
     <!-- Modals -->
-    <div id="attendance-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop"> ... </div>
-    <div id="view-attendance-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop"> ... </div>
-    <div id="admin-login-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop"> ... </div>
-    <div id="upload-report-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop"> ... </div>
-    <div id="archive-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop"> ... </div>
-    <div id="fullscreen-image-modal" class="fixed inset-0 z-[60] hidden items-center justify-center modal-backdrop" onclick="hideModal('fullscreen-image-modal')"> ... </div>
-    
-    <!-- [DIUBAH] Posisi Toast Notification dipindah ke atas tombol admin -->
+    <div id="attendance-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
+        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-md shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-4">Input Daftar Hadir</h3>
+            <form id="attendance-form" class="space-y-4">
+                <div>
+                    <label for="name-input" class="text-white/80 text-sm mb-1 block">Nama Lengkap</label>
+                    <input id="name-input" list="attendee-names-list" name="name" placeholder="Ketik atau pilih nama" class="w-full p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600" required>
+                    <datalist id="attendee-names-list"></datalist>
+                </div>
+                <input type="text" name="unit" placeholder="Unit / Bagian" class="w-full p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600" required>
+                <div>
+                    <label class="text-white/80 text-sm mb-1 block">Tanda Tangan di sini:</label>
+                    <div id="signature-pad-wrapper" class="relative w-full h-40">
+                        <canvas id="signature-canvas"></canvas>
+                    </div>
+                    <button type="button" id="clear-signature-button" class="text-xs text-white/80 hover:text-white mt-1">Bersihkan</button>
+                </div>
+                <div class="flex gap-4 pt-2">
+                    <button type="submit" class="glass-button flex-1 py-2 px-4 rounded-lg text-white font-semibold">Kirim</button>
+                    <button type="button" onclick="hideModal('attendance-modal')" class="bg-red-500/50 hover:bg-red-500/80 flex-1 py-2 px-4 rounded-lg text-white font-semibold transition">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="view-attendance-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
+        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-4xl shadow-2xl max-h-[80vh] flex flex-col">
+            <h3 class="text-xl font-bold text-white mb-4">Daftar Kehadiran</h3>
+            <div id="attendance-list-container" class="overflow-auto flex-grow">
+                <div id="attendance-loader" class="flex justify-center items-center h-full"><div class="loader"></div></div>
+                <table id="attendance-table" class="w-full text-white table-auto table-glass hidden">
+                    <thead class="text-left">
+                        <tr>
+                            <th class="p-2">Waktu</th><th class="p-2">Nama</th><th class="p-2">Unit</th><th class="p-2">Tanda Tangan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendance-table-body"></tbody>
+                </table>
+            </div>
+            <div id="pagination-controls" class="flex justify-between items-center mt-4 text-white hidden">
+                <button id="prev-page-btn" class="glass-button px-4 py-2 rounded-lg">Sebelumnya</button>
+                <span id="page-info" class="font-semibold"></span>
+                <button id="next-page-btn" class="glass-button px-4 py-2 rounded-lg">Berikutnya</button>
+            </div>
+            <button type="button" onclick="hideModal('view-attendance-modal')" class="bg-red-500/50 hover:bg-red-500/80 w-full mt-4 py-2 px-4 rounded-lg text-white font-semibold transition">Tutup</button>
+        </div>
+    </div>
+    <div id="admin-login-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
+        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-sm shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-4">Login Admin</h3>
+            <input type="password" id="admin-password-input" placeholder="Masukkan password admin" class="w-full p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-white">
+            <div class="flex gap-4 mt-4">
+                <button id="login-submit-button" class="glass-button flex-1 py-2 px-4 rounded-lg text-white font-semibold">Login</button>
+                <button type="button" onclick="hideModal('admin-login-modal')" class="bg-red-500/50 hover:bg-red-500/80 flex-1 py-2 px-4 rounded-lg text-white font-semibold transition">Batal</button>
+            </div>
+        </div>
+    </div>
+    <div id="upload-report-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
+        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-md shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-4">Upload Bahan Laporan</h3>
+            <form id="upload-report-form" class="space-y-4">
+                <input type="text" name="uploaderName" placeholder="Nama Pengunggah" class="w-full p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600" required>
+                <input type="file" name="file" class="block w-full text-sm text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white/80 file:text-sky-700 hover:file:bg-white" required>
+                <div class="flex gap-4 pt-2">
+                    <button type="submit" class="glass-button flex-1 py-2 px-4 rounded-lg text-white font-semibold">Upload</button>
+                    <button type="button" onclick="hideModal('upload-report-modal')" class="bg-red-500/50 hover:bg-red-500/80 flex-1 py-2 px-4 rounded-lg text-white font-semibold transition">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="archive-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
+        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-4xl shadow-2xl max-h-[80vh] flex flex-col">
+            <h3 class="text-xl font-bold text-white mb-4">Arsip Laporan</h3>
+            <div id="archive-list-container" class="overflow-auto flex-grow">
+                <div id="archive-loader" class="flex justify-center items-center h-full"><div class="loader"></div></div>
+                <table id="archive-table" class="w-full text-white table-auto table-glass hidden">
+                    <thead class="text-left">
+                        <tr><th class="p-2">Waktu Unggah</th><th class="p-2">Nama File</th><th class="p-2">Pengunggah</th><th class="p-2">Aksi</th></tr>
+                    </thead>
+                    <tbody id="archive-table-body"></tbody>
+                </table>
+            </div>
+            <button type="button" onclick="hideModal('archive-modal')" class="bg-red-500/50 hover:bg-red-500/80 w-full mt-4 py-2 px-4 rounded-lg text-white font-semibold transition">Tutup</button>
+        </div>
+    </div>
+    <div id="fullscreen-image-modal" class="fixed inset-0 z-[60] hidden items-center justify-center modal-backdrop" onclick="hideModal('fullscreen-image-modal')">
+        <button class="absolute top-4 right-4 text-white text-4xl z-10" onclick="hideModal('fullscreen-image-modal')">
+            <i class="ph-bold ph-x-circle"></i>
+        </button>
+        <img id="fullscreen-image-content" src="" alt="Jadwal Fullscreen" class="max-w-[95vw] max-h-[95vh] object-contain" onclick="event.stopPropagation()">
+    </div>
     <div id="toast" class="fixed bottom-24 right-5 z-50 glass-card p-4 rounded-lg shadow-2xl hidden transform translate-y-20 transition-transform duration-500">
         <p id="toast-message" class="text-white font-semibold"></p>
     </div>
 
-    <!-- [BARU] Tombol Login Admin Mengambang -->
     <button id="admin-login-button" class="fixed bottom-5 right-5 z-50 glass-button h-16 w-16 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transform transition-transform">
         <i class="ph-fill ph-user-gear text-3xl text-white"></i>
     </button>
