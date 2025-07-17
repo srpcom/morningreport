@@ -20,7 +20,8 @@
         .modal-backdrop { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); }
         .table-glass thead { background: rgba(255, 255, 255, 0.3); }
         .table-glass tbody tr { background: rgba(255, 255, 255, 0.15); border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
-        .table-glass td, .table-glass th { padding: 0.3rem 0.5rem; } /* Jarak baris lebih kecil */
+        /* [DIUBAH] Jarak baris lebih kecil */
+        .table-glass td, .table-glass th { padding: 0.2rem 0.5rem; } 
         .loader { border: 4px solid rgba(255, 255, 255, 0.3); border-left-color: #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         #signature-canvas { border: 1px solid #e2e8f0; border-radius: 0.5rem; cursor: crosshair; background-color: #ffffff; width: 100%; height: 100%; }
@@ -32,7 +33,6 @@
         #sticky-header.show {
             transform: translateY(0);
         }
-        /* Menyembunyikan input tanggal secara visual tapi tetap fungsional */
         .visually-hidden {
             position: absolute;
             width: 1px;
@@ -140,10 +140,11 @@
         </div>
     </div>
     <div id="view-attendance-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
-        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-4xl shadow-2xl max-h-[80vh] flex flex-col">
-            <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
-                <h3 id="attendance-title" class="text-xl font-bold text-white mb-2 sm:mb-0">Daftar Kehadiran</h3>
-                <div class="flex items-center gap-2">
+        <!-- [DIUBAH] Modal View Hadir dengan style baru -->
+        <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-4 sm:p-6 w-11/12 max-w-4xl max-h-[90vh] flex flex-col">
+            <div class="flex flex-col items-center mb-4">
+                <h3 id="attendance-title" class="text-xl font-bold text-white text-center">Daftar Kehadiran</h3>
+                <div class="flex items-center gap-2 mt-2">
                     <label for="attendance-date-picker" class="glass-button flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer">
                         <i class="ph-fill ph-calendar text-xl text-white"></i>
                     </label>
@@ -153,7 +154,8 @@
                     </button>
                 </div>
             </div>
-            <div id="attendance-list-container" class="overflow-auto flex-grow">
+            <!-- [DIUBAH] Kontainer tabel dengan tinggi spesifik di mobile -->
+            <div id="attendance-list-container" class="overflow-auto flex-grow h-[24rem] sm:h-auto">
                 <div id="attendance-loader" class="flex justify-center items-center h-full"><div class="loader"></div></div>
                 <table id="attendance-table" class="w-full text-white table-auto table-glass hidden">
                     <thead class="text-left">
@@ -235,7 +237,7 @@
         let adminPassword = null;
         let signaturePad;
         let currentPage = 1;
-        const rowsPerPage = 20;
+        const rowsPerPage = 10; // [DIUBAH] Paginasi menjadi 10
         let fullAttendanceData = [];
         let filteredAttendanceData = [];
         let allAttendeesData = [];
