@@ -51,6 +51,7 @@
     <div class="container mx-auto p-4 md:p-6 max-w-5xl">
         <!-- Header Utama -->
         <header class="text-center pt-8 mb-6">
+            <!-- [DIUBAH] Border putih pada logo utama dikembalikan -->
             <img src="https://files.catbox.moe/c4lwfb.jpg" alt="Logo RSUD" class="mx-auto h-24 w-24 rounded-full object-cover mb-4 shadow-lg border-4 border-white">
             <h1 class="text-3xl md:text-4xl font-bold text-white text-shadow">Aplikasi Morning Report</h1>
             <p class="text-white/80 mt-1">RSUD dr. R. Koesma Tuban</p>
@@ -59,20 +60,20 @@
         <!-- Main Content -->
         <main>
             <!-- Jadwal Kegiatan -->
-            <div id="schedule-section" class="glass-card rounded-2xl py-4 md:p-6 mb-6 shadow-xl">
-                 <div class="flex justify-between items-center mb-4 px-4 md:px-0">
+            <div id="schedule-section" class="glass-card rounded-2xl p-4 md:p-6 mb-6 shadow-xl">
+                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-bold text-white">Jadwal Kegiatan</h2>
                     <button id="admin-login-button" class="p-2 rounded-full hover:bg-white/20 transition-colors">
                         <i class="ph-fill ph-user-gear text-2xl text-white"></i>
                     </button>
                 </div>
-                <!-- [DIUBAH] Kontainer gambar dengan padding yang benar dan margin negatif hanya di mobile -->
-                <div id="schedule-image-container" class="bg-black/20 min-h-[200px] max-h-[70vh] flex items-center justify-center -mx-4 md:mx-0 md:rounded-lg">
-                    <!-- [DIUBAH] Kelas h-full dihapus agar tinggi gambar menyesuaikan rasio aslinya -->
-                    <img id="schedule-image" src="" alt="Jadwal Kegiatan" class="w-full object-contain hidden md:rounded-lg cursor-pointer">
+                <!-- [DIUBAH] Kontainer gambar dengan margin negatif HANYA untuk mobile -->
+                <div id="schedule-image-container" class="bg-black/20 min-h-[250px] flex items-center justify-center -mx-4 md:mx-0 md:rounded-lg">
+                    <!-- [DIUBAH] h-auto agar tinggi gambar menyesuaikan rasio aslinya -->
+                    <img id="schedule-image" src="" alt="Jadwal Kegiatan" class="w-full h-auto object-contain hidden md:rounded-lg cursor-pointer">
                     <p id="no-schedule-text" class="text-white/70">Jadwal belum tersedia.</p>
                 </div>
-                <div id="admin-panel" class="hidden mt-4 px-4 md:px-0">
+                <div id="admin-panel" class="hidden mt-4 pt-4 border-t border-white/20">
                     <p class="text-white font-semibold mb-2">Panel Admin: Ganti Gambar Jadwal</p>
                     <input type="file" id="schedule-file-input" class="block w-full text-sm text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-white/80 file:text-sky-700 hover:file:bg-white">
                     <button id="upload-schedule-button" class="glass-button w-full mt-2 py-2 px-4 rounded-lg text-white font-semibold">Unggah Jadwal Baru</button>
