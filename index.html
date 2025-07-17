@@ -20,8 +20,7 @@
         .modal-backdrop { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); }
         .table-glass thead { background: rgba(255, 255, 255, 0.3); }
         .table-glass tbody tr { background: rgba(255, 255, 255, 0.15); border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
-        /* [DIUBAH] Jarak baris lebih kecil */
-        .table-glass td, .table-glass th { padding: 0.2rem 0.5rem; } 
+        .table-glass td, .table-glass th { padding: 0.3rem 0.5rem; }
         .loader { border: 4px solid rgba(255, 255, 255, 0.3); border-left-color: #fff; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         #signature-canvas { border: 1px solid #e2e8f0; border-radius: 0.5rem; cursor: crosshair; background-color: #ffffff; width: 100%; height: 100%; }
@@ -140,22 +139,20 @@
         </div>
     </div>
     <div id="view-attendance-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-backdrop">
-        <!-- [DIUBAH] Modal View Hadir dengan style baru -->
-        <div class="bg-white/20 backdrop-blur-xl rounded-2xl p-4 sm:p-6 w-11/12 max-w-4xl max-h-[90vh] flex flex-col">
-            <div class="flex flex-col items-center mb-4">
-                <h3 id="attendance-title" class="text-xl font-bold text-white text-center">Daftar Kehadiran</h3>
-                <div class="flex items-center gap-2 mt-2">
-                    <label for="attendance-date-picker" class="glass-button flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer">
+        <div class="glass-card rounded-2xl p-6 w-11/12 max-w-4xl shadow-2xl max-h-[80vh] flex flex-col">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
+                <h3 id="attendance-title" class="text-xl font-bold text-white mb-2 sm:mb-0">Daftar Kehadiran</h3>
+                <div class="flex items-center gap-2">
+                    <button id="date-picker-button" class="glass-button flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer">
                         <i class="ph-fill ph-calendar text-xl text-white"></i>
-                    </label>
+                    </button>
                     <input type="date" id="attendance-date-picker" class="visually-hidden">
                     <button id="refresh-attendance-btn" class="glass-button flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer">
                         <i class="ph-fill ph-arrow-clockwise text-xl text-white"></i>
                     </button>
                 </div>
             </div>
-            <!-- [DIUBAH] Kontainer tabel dengan tinggi spesifik di mobile -->
-            <div id="attendance-list-container" class="overflow-auto flex-grow h-[24rem] sm:h-auto">
+            <div id="attendance-list-container" class="overflow-auto flex-grow">
                 <div id="attendance-loader" class="flex justify-center items-center h-full"><div class="loader"></div></div>
                 <table id="attendance-table" class="w-full text-white table-auto table-glass hidden">
                     <thead class="text-left">
@@ -164,7 +161,6 @@
                             <th>Waktu</th>
                             <th>Nama</th>
                             <th>Unit</th>
-                            <th class="text-center">Tanda Tangan</th>
                         </tr>
                     </thead>
                     <tbody id="attendance-table-body"></tbody>
@@ -237,7 +233,7 @@
         let adminPassword = null;
         let signaturePad;
         let currentPage = 1;
-        const rowsPerPage = 10; // [DIUBAH] Paginasi menjadi 10
+        const rowsPerPage = 10;
         let fullAttendanceData = [];
         let filteredAttendanceData = [];
         let allAttendeesData = [];
@@ -375,7 +371,7 @@
             tbody.innerHTML = '';
 
             if (filteredAttendanceData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">Tidak ada data kehadiran pada tanggal ini.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Tidak ada data kehadiran pada tanggal ini.</td></tr>';
                 paginationControls.classList.add('hidden');
                 return;
             }
@@ -392,8 +388,7 @@
             paginatedItems.forEach((row, index) => {
                 const rowNumber = start + index + 1;
                 const timeOnly = new Date(row.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }).replace(/\./g, ':');
-                const signatureCell = row.signatureUrl ? `<a href="${row.signatureUrl}" target="_blank" class="text-sky-300 hover:text-sky-100">Lihat</a>` : 'Tidak ada';
-                tbody.innerHTML += `<tr><td class="text-center">${rowNumber}</td><td>${timeOnly}</td><td>${row.name}</td><td>${row.unit}</td><td class="text-center">${signatureCell}</td></tr>`;
+                tbody.innerHTML += `<tr><td class="text-center">${rowNumber}</td><td>${timeOnly}</td><td>${row.name}</td><td>${row.unit}</td></tr>`;
             });
 
             prevBtn.disabled = currentPage === 1;
@@ -416,7 +411,7 @@
                 filterAndRenderAttendance();
             } else {
                 const tbody = document.getElementById('attendance-table-body');
-                if(tbody) tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center">Gagal memuat data.</td></tr>';
+                if(tbody) tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Gagal memuat data.</td></tr>';
             }
             showLoader('attendance', false);
         }
