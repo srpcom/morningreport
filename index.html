@@ -132,18 +132,28 @@
         <div class="glass-card rounded-2xl p-6 w-11/12 max-w-4xl shadow-2xl max-h-[80vh] flex flex-col">
             <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
                 <h3 id="attendance-title" class="text-xl font-bold text-white mb-2 sm:mb-0">Daftar Kehadiran</h3>
-                <input type="date" id="attendance-date-picker" class="p-2 rounded-lg bg-white/50 border border-white/50 text-gray-800 placeholder-gray-600">
+                <div class="flex items-center gap-2">
+                    <div class="relative">
+                        <label for="attendance-date-picker" class="glass-button flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer">
+                            <i class="ph-fill ph-calendar text-xl text-white"></i>
+                        </label>
+                        <input type="date" id="attendance-date-picker" class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer">
+                    </div>
+                    <button id="refresh-attendance-btn" class="glass-button flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer">
+                        <i class="ph-fill ph-arrow-clockwise text-xl text-white"></i>
+                    </button>
+                </div>
             </div>
             <div id="attendance-list-container" class="overflow-auto flex-grow">
                 <div id="attendance-loader" class="flex justify-center items-center h-full"><div class="loader"></div></div>
                 <table id="attendance-table" class="w-full text-white table-auto table-glass hidden">
                     <thead class="text-left">
                         <tr>
-                            <th class="w-12">No.</th>
+                            <th class="w-12 text-center">No.</th>
                             <th>Waktu</th>
                             <th>Nama</th>
                             <th>Unit</th>
-                            <th>Tanda Tangan</th>
+                            <th class="text-center">Tanda Tangan</th>
                         </tr>
                     </thead>
                     <tbody id="attendance-table-body"></tbody>
@@ -318,17 +328,19 @@
         
         function filterAndRenderAttendance() {
             const datePicker = document.getElementById('attendance-date-picker');
-            const selectedDate = new Date(datePicker.value);
-            const selectedDateString = new Date(selectedDate.getTime() - (selectedDate.getTimezoneOffset() * -60000 )).toISOString().split('T')[0];
-
+            const titleEl = document.getElementById('attendance-title');
+            if (!datePicker || !titleEl) return;
+            
+            const selectedDateString = datePicker.value; // Format YYYY-MM-DD
+            
             filteredAttendanceData = fullAttendanceData.filter(item => {
                 const itemDate = new Date(item.timestamp);
-                const itemDateString = new Date(itemDate.getTime() - (itemDate.getTimezoneOffset() * -60000 )).toISOString().split('T')[0];
+                const itemDateString = itemDate.toISOString().split('T')[0];
                 return itemDateString === selectedDateString;
             });
-
-            const titleEl = document.getElementById('attendance-title');
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            
+            const selectedDate = new Date(selectedDateString + 'T00:00:00');
+            const options = { day: 'numeric', month: 'long', year: 'numeric' };
             titleEl.textContent = `Daftar Kehadiran ${selectedDate.toLocaleDateString('id-ID', options)}`;
 
             currentPage = 1;
@@ -363,7 +375,7 @@
                 const rowNumber = start + index + 1;
                 const timeOnly = new Date(row.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }).replace(/\./g, ':');
                 const signatureCell = row.signatureUrl ? `<a href="${row.signatureUrl}" target="_blank" class="text-sky-300 hover:text-sky-100">Lihat</a>` : 'Tidak ada';
-                tbody.innerHTML += `<tr><td>${rowNumber}</td><td>${timeOnly}</td><td>${row.name}</td><td>${row.unit}</td><td>${signatureCell}</td></tr>`;
+                tbody.innerHTML += `<tr><td class="text-center">${rowNumber}</td><td>${timeOnly}</td><td>${row.name}</td><td>${row.unit}</td><td class="text-center">${signatureCell}</td></tr>`;
             });
 
             prevBtn.disabled = currentPage === 1;
@@ -375,12 +387,15 @@
             document.getElementById('pagination-controls')?.classList.add('hidden');
             
             const datePicker = document.getElementById('attendance-date-picker');
-            if(datePicker) datePicker.valueAsDate = new Date();
+            if(datePicker) {
+                const today = new Date();
+                datePicker.value = today.toISOString().split('T')[0];
+            }
 
             const data = await callGAS({ action: 'getAttendanceList' });
             
             if (data) {
-                fullAttendanceData = data.reverse();
+                fullAttendanceData = data; 
                 filterAndRenderAttendance();
             } else {
                 const tbody = document.getElementById('attendance-table-body');
@@ -578,6 +593,7 @@
             }
             
             document.getElementById('attendance-date-picker')?.addEventListener('change', filterAndRenderAttendance);
+            document.getElementById('refresh-attendance-btn')?.addEventListener('click', getAttendance);
         });
 
         window.addEventListener('scroll', () => {
